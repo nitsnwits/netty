@@ -8,4 +8,4 @@ project_base="/Users/neerajsharma/Downloads/core-netty-4.2"
 
 rm ${project_base}/python/comm_pb2.py
 
-protoc -I=${project_base}/resources --python_out=. ${project_base}/resources/comm.proto 
+${protoc_home}/bin/protoc -I=${project_base}/resources --python_out=. ${project_base}/resources/comm.proto 
