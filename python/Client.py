@@ -7,7 +7,8 @@
 
 
 from SocketChannel import SocketChannel, SocketChannelFactory
-from comm_pb2 import Request, Response
+import comm_pb2
+from comm_pb2 import Request
 import struct, random, sys, os
 
 class Client():
@@ -29,7 +30,7 @@ class Client():
 			self.printPhotoReadRequest(response)
 
 	def preparePhotoCreateRequest(self, param):
-		request = PhotoRequest()
+		request = Request()
 
 		# set headers for the request
 		header = request.header
@@ -56,7 +57,7 @@ class Client():
 		return request
 
 	def preparePhotoReadRequest(self, param):
-		request = PhotoRequest()
+		request = Request()
 
 		#set headers for the request
 		header = request.header
