@@ -1,5 +1,9 @@
 .classpath
 .project
 .settings
-python/build_pb.sh
 build_pb.sh
+python/*.sh
+*.sh
+classes/
+python/comm_pb2.*
+generated/
