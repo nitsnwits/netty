@@ -2,7 +2,7 @@ import comm_pb2
 import socket               
 import time
 import struct
-
+from comm_pb2 import Request
 
 def buildPing(tag, number):
 
@@ -411,7 +411,8 @@ def buildStub():
     header = r.header
     header.routing_id = comm_pb2.Header.JOBS
     header.originator = 1 
-    
+
+    r.body.photoPayload.uuid = "blah"
     msg = r.SerializeToString()
     return msg     
 
