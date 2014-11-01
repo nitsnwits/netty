@@ -148,6 +148,10 @@ public class ElectionManager implements ElectionListener {
 
 		// now send it out to all my edges
 		logger.info("Election started by node " + conf.getNodeId());
+//		if (mhb.getPathCount() == 1) {
+//			logger.info("No other nodes in the network graph. Setting " + conf.getNodeId() + " as the leader.");
+//			this.leaderNode = conf.getNodeId();
+//		}
 		ConnectionManager.broadcast(mb.build());
 	}
 
@@ -155,6 +159,7 @@ public class ElectionManager implements ElectionListener {
 	 * @param args
 	 */
 	public void processRequest(Management mgmt) {
+		logger.info("started process request election manager ");
 		if (!mgmt.hasElection())
 			return;
 

@@ -105,11 +105,14 @@ public class ConnectionManager {
 	}
 
 	public synchronized static void broadcast(Management mgmt) {
+		//logger.info("Found mgmt in broadcast: " + mgmt);
 		if (mgmt == null)
 			return;
 
-		for (Channel ch : mgmtConnections.values())
+		for (Channel ch : mgmtConnections.values()) {
+			//logger.info("Writing to channel: " + ch);
 			ch.write(mgmt);
+		}
 	}
 
 	public static int getNumMgmtConnections() {

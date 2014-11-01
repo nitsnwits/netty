@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import poke.server.conf.ServerConf;
 import poke.server.conf.ServerConf.AdjacentConf;
 import poke.server.management.ManagementQueue;
+import poke.server.management.ManagementQueue.ManagementQueueEntry;
 import poke.server.managers.HeartbeatData.BeatStatus;
 
 import com.google.protobuf.GeneratedMessage;
@@ -285,6 +286,14 @@ public class HeartbeatManager extends Thread {
 			if (outgoingHB.containsValue(heart)) {
 				logger.warn("HB outgoing channel closing for node '" + heart.getNodeId() + "' at " + heart.getHost());
 				outgoingHB.remove(future.channel());
+				//attempt to start an election if the leader node is found down
+				ElectionManager em = ElectionManager.getInstance();
+				if(em.whoIsTheLeader() == heart.getNodeId()) {
+					logger.info("Found the leader is down, starting election again ");
+					em.startElection();
+				} else {
+					logger.info("The node which got down was not the leader, did not start election");
+				}
 			} else if (incomingHB.containsValue(heart)) {
 				logger.warn("HB incoming channel closing for node '" + heart.getNodeId() + "' at " + heart.getHost());
 				incomingHB.remove(future.channel());
