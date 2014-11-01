@@ -51,7 +51,8 @@ class Client():
 		with open(param, 'rb') as image:
 			readImage = image.read()
 			readImageByteArray = bytearray(readImage)
-		photoPayload.data = readImageByteArray
+		print "req: " + str(request)
+		photoPayload.data = str(readImageByteArray)
 
 		#finish preparing the request
 		return request
@@ -93,7 +94,7 @@ class Client():
 	 #  print "Ping Tag - " + str(resp.body.ping.tag)
 
 					  
-	def run(self, host, port, request):
+	def send(self, host, port, request):
 		self.channel = self.channelFactory.openChannel(host, port)
 		while self.channel.connected:
 			print "Channel Connected..."
