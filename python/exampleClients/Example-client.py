@@ -403,6 +403,18 @@ def getBroadcastMsg(port):
    
     data = sock.recv(1024)  # buffer size is 1024 bytes
     return data
+
+def buildStub():
+    jobId = str(int(round(time.time() * 1000)))
+
+    r = comm_pb2.Request()
+    header = r.header
+    header.routing_id = comm_pb2.Header.JOBS
+    header.originator = 1 
+    
+    msg = r.SerializeToString()
+    return msg     
+
         
    
 if __name__ == '__main__':
@@ -437,6 +449,11 @@ if __name__ == '__main__':
             if result.body.job_status.status == 2:
                 login = True
                 whoAmI = result.body.job_status.data[0].owner_id
+    elif input == "10":
+        print("This is a stubbed request")
+        job = buildStub()
+        result = sendMsg(job, port, host)
+
     while True:
         input = raw_input("\nPlease select your desirable action:\n0.Quit\n1.Get a course description\n2.List all courses being offered\n3.Ask a question\n4.See all posted questions\n5.Answer a Question\n6.See all posted answers\n")
         if input == "1":
