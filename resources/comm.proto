@@ -25,17 +25,17 @@ message Header {
     // implementation and since requests and responses differ only
     // by these two fields, a new message is not created.
 
-    optional PokeStatus reply_code = 5;
+    //optional PokeStatus reply_code = 5;
     optional string reply_msg = 6;
    
     // the path a message takes - to handle cycles in the network
-    repeated RoutingPath path = 7;
+    //repeated RoutingPath path = 7;
 
     // if the message is for a specific node, this will be set
     optional int32 toNode = 8;
 
     // catch all for options
-    repeated NameValueSet options = 9;
+    //repeated NameValueSet options = 9;
 
     enum Routing {
 
@@ -44,7 +44,7 @@ message Header {
         JOBS = 4;
         REPORTS = 10;
         MANAGE = 100;
-        
+
     }
 
 }
@@ -52,18 +52,18 @@ message Header {
 message Payload {
 
     // requests & replies
-    optional Ping ping = 1;
+    //optional Ping ping = 1;
 
     // requests only
-    optional NameSpaceOperation space_op = 2;
-    optional JobOperation job_op = 3;
+    //optional NameSpaceOperation space_op = 2;
+    //optional JobOperation job_op = 3;
 
     //image req/ resp
     optional PhotoPayload photoPayload = 4;
 
     // replies only
-    optional JobStatus job_status = 13;
-    optional NameSpaceStatus space_status = 12;
+    //optional JobStatus job_status = 13;
+    //optional NameSpaceStatus space_status = 12;
    
     // TBD
     // reports
