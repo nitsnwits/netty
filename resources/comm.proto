@@ -1,39 +1,99 @@
-//package some.photo.package;
-option java_package = "eye";
-//option java_outer_classname = "SomeClass";
+//Google protobuf file for PhotoRequest and PhotoResponse
 
-message PhotoResponse {
-    enum ResponseFlag {
-        success = 0;
-        failure = 1;
-    }
-    
-    enum ResponseType {
-        read = 0;
-        write = 1;
-        delete = 2;
-    }
-    
-    required ResponseFlag responseFlag = 1 [default = success];
-    required ResponseType responseType = 2 [default = read];
-    optional int64 lastModified = 3;                     // Unix timestamp
-    optional string uuid = 4;                            // Required for all types, optional for simplicity/flexibility
-    optional bytes photo = 5;                            // Required for Type 0
+option optimize_for = SPEED;
+option java_package = 'eye';
+
+
+message Request {
+
+    required Header header = 1;
+    required Payload body = 2;
+
 }
 
-message PhotoRequest {
+message Header { 
+
+    required Routing routing_id = 1;
+    required int32 originator = 2;
+    optional string tag = 3;
+    optional int64 time = 4;
+   
+    //image request
+    optional PhotoHeader photoHeader = 10;
+   
+    // while we can use extensions, it is not a clean inheritance
+    // implementation and since requests and responses differ only
+    // by these two fields, a new message is not created.
+
+    optional PokeStatus reply_code = 5;
+    optional string reply_msg = 6;
+   
+    // the path a message takes - to handle cycles in the network
+    repeated RoutingPath path = 7;
+
+    // if the message is for a specific node, this will be set
+    optional int32 toNode = 8;
+
+    // catch all for options
+    repeated NameValueSet options = 9;
+
+    enum Routing {
+
+        PING = 2;
+        NAMESPACES = 3;
+        JOBS = 4;
+        REPORTS = 10;
+        MANAGE = 100;
+        
+    }
+
+}
+
+message Payload {
+
+    // requests & replies
+    optional Ping ping = 1;
+
+    // requests only
+    optional NameSpaceOperation space_op = 2;
+    optional JobOperation job_op = 3;
+
+    //image req/ resp
+    optional PhotoPayload photoPayload = 4;
+
+    // replies only
+    optional JobStatus job_status = 13;
+    optional NameSpaceStatus space_status = 12;
+   
+    // TBD
+    // reports
+
+}
+
+message PhotoHeader {
+   
+    optional RequestType requestType = 1 [default = read];
+    optional ResponseFlag responseFlag = 2 [default = success];
+    optional int64 lastModified = 3;                     // Unix timestamp
+    optional int32 contentLength = 4;
+   
     enum RequestType {
         read = 0;
         write = 1;
         delete = 2;
     }
-    
-    required RequestType requestType = 1 [default = read];
-    optional string uuid = 2;                            // Required for types 0 & 2
-    optional string name = 3;                            // Required for type 1
-    optional bytes data = 4;                             // Required for type 1
-    
-    //optional int32 contentLength = 5;                    // Optional: Used for Integrity check, if protobuf does not fill this in automatically, then it should be discarded
-
+   
+    enum ResponseFlag {
+        success = 0;
+        failure = 1;
+    }
+   
 }
 
+message PhotoPayload {
+   
+    optional string uuid = 1;                            // Required for types 0 & 2
+    optional string name = 2;                            // Required for type 1
+    optional bytes data = 3;                             // Required for type 1
+   
+}
