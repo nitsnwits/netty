@@ -7,7 +7,8 @@
 
 
 from SocketChannel import SocketChannel, SocketChannelFactory
-from comm_pb2 import Request, Response
+import comm_pb2
+from comm_pb2 import Request
 import struct, random, sys, os
 
 class Client():
@@ -29,7 +30,7 @@ class Client():
 			self.printPhotoReadRequest(response)
 
 	def preparePhotoCreateRequest(self, param):
-		request = PhotoRequest()
+		request = Request()
 
 		# set headers for the request
 		header = request.header
@@ -50,13 +51,14 @@ class Client():
 		with open(param, 'rb') as image:
 			readImage = image.read()
 			readImageByteArray = bytearray(readImage)
-		photoPayload.data = readImageByteArray
+		print "req: " + str(request)
+		photoPayload.data = str(readImageByteArray)
 
 		#finish preparing the request
 		return request
 
 	def preparePhotoReadRequest(self, param):
-		request = PhotoRequest()
+		request = Request()
 
 		#set headers for the request
 		header = request.header
@@ -92,7 +94,7 @@ class Client():
 	 #  print "Ping Tag - " + str(resp.body.ping.tag)
 
 					  
-	def run(self, host, port, request):
+	def send(self, host, port, request):
 		self.channel = self.channelFactory.openChannel(host, port)
 		while self.channel.connected:
 			print "Channel Connected..."
