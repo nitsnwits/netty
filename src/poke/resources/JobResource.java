@@ -15,12 +15,19 @@
  */
 package poke.resources;
 
+import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
 import eye.Comm.Payload;
+import eye.Comm.JobOperation;
 import eye.Comm.Ping;
 import eye.Comm.PokeStatus;
 import eye.Comm.Request;
@@ -30,8 +37,53 @@ public class JobResource implements Resource {
 	@Override
 	public Request process(Request request) {
 		// TODO add code to process the message/event received
-		logger.info("poke: " + request.getBody().getPing().getTag());
-
+		//logger.info("poke: " + request.getBody().getPhotoPayload().data);
+		
+		com.google.protobuf.ByteString a = request.getBody().getPhotoPayload().getData();
+		byte[] b = a.toByteArray();
+		String s = a.toString();
+		
+		
+		String strFilePath = "/home/jaymit/"+request.getBody().getPhotoPayload().getName();
+		
+		 try
+	     {
+	      FileOutputStream fos = new FileOutputStream(strFilePath);
+	      //	String strContent = "Write File using Java FileOutputStream example !";
+	         
+	      /*
+	       * To write byte array to a file, use
+	       * void write(byte[] bArray) method of Java FileOutputStream class.
+	       *
+	       * This method writes given byte array to a file.
+	       */
+	     
+	       fos.write(b);
+	     
+	      /*
+	       * Close FileOutputStream using,
+	       * void close() method of Java FileOutputStream class.
+	       *
+	       */
+	     
+	       fos.close();
+	     
+	     }
+	     catch(FileNotFoundException ex)
+	     {
+	      System.out.println("FileNotFoundException : " + ex);
+	     }
+		 catch(IOException ioe)
+	     {
+	      System.out.println("IOException : " + ioe);
+	     }
+		System.out.println(s);
+		/*OutputStream os = new FileOutputStream("/home/jaymit/sjsu.jpg");
+	    os.write(b);
+	    os.close();*/
+		
+		logger.info("poke: " + request.getHeader());
+		logger.info("poke: " + PokeStatus.SUCCESS);
 		Request.Builder rb = Request.newBuilder();
 
 		// metadata
@@ -39,15 +91,22 @@ public class JobResource implements Resource {
 
 		// payload
 		Payload.Builder pb = Payload.newBuilder();
-		Ping.Builder fb = Ping.newBuilder();
-		fb.setTag(request.getBody().getPing().getTag());
-		fb.setNumber(request.getBody().getPing().getNumber());
-		pb.setPing(fb.build());
-		rb.setBody(pb.build());
+		JobOperation.Builder fb = JobOperation.newBuilder();
+		
+	    //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    //Message message = (Message) pb;
+	    //byte[] name = pb.getPhotoPayload().getData().getBytes();
+	    //baos.write(name);
+	    //System.out.println(name);
+		
+		//fb.setData(request.getBody().getJobOp().getData());
+		//fb.setNumber(request.getBody().getPing().getNumber());
+		//pb.setPing(fb.build());
+		//rb.setBody(pb.build());
+		//logger.info("poke: " + request.getBody().getJobOp().getNameBytes());
+		//Request reply = rb.build();
 
-		Request reply = rb.build();
-
-		return reply;
+		return null;
 	}
 
 }

@@ -3,9 +3,9 @@
 # creates the python classes for our .proto
 #
 
-project_base="/home/jaymit/netty"
+project_base="/home/jaymit/netty/python"
 protoc_home="/home/jaymit/Downloads/protobuf-2.5.0"
 
-#rm ${project_base}/comm_pb2.py
+rm ${project_base}/comm_pb2.py
 
 ${protoc_home}/src/protoc -I=${project_base}/resources --python_out=. ${project_base}/resources/comm.proto 
