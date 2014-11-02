@@ -73,11 +73,11 @@ public class JobResource implements Resource {
 		Request.Builder rb = Request.newBuilder();
 
 		// metadata
-		//rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), PokeStatus.SUCCESS, null));
+		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), PokeStatus.SUCCESS, null));
 
 		// payload
-		//Payload.Builder pb = Payload.newBuilder();
-		//JobOperation.Builder fb = JobOperation.newBuilder();
+		Payload.Builder pb = Payload.newBuilder();
+		JobOperation.Builder fb = JobOperation.newBuilder();
 		
 	    //ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    //Message message = (Message) pb;
