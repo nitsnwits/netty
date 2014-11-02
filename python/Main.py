@@ -37,9 +37,9 @@ while client:
 		Client().executeOperation(requestType, host, port, uuid)	
 		  
 	elif choice == 3:
-		  print "Bye!"
-		  client = False #client shut down.
+		print "Bye!"
+		client = False #client shut down.
 	else:
-		  print "\t\tPlease choose a valid option."   
+		print "\t\tPlease choose a valid option."   
 		   
 
