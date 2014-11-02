@@ -20,6 +20,9 @@ import java.util.List;
 import poke.server.conf.ServerConf;
 import eye.Comm.Header;
 import eye.Comm.Header.Routing;
+import eye.Comm.PhotoHeader;
+import eye.Comm.PhotoHeader.RequestType;
+import eye.Comm.PhotoHeader.ResponseFlag;
 import eye.Comm.PokeStatus;
 import eye.Comm.Request;
 import eye.Comm.RoutingPath;
@@ -90,6 +93,18 @@ public class ResourceUtil {
 		bldr.setHeader(hdr);
 
 		// TODO add logging
+
+		return bldr.build();
+	}
+	public static Header buildPhotoHeader(Request request) {
+		Header.Builder bldr = Header.newBuilder();
+		bldr.setOriginator(ResourceFactory.getCfg().getNodeId());
+		bldr.setRoutingId(request.getHeader().getRoutingId());
+		PhotoHeader.Builder phb= PhotoHeader.newBuilder();
+		phb.setRequestType(request.getHeader().getPhotoHeader().getRequestType());
+		phb.setResponseFlag(ResponseFlag.success);
+
+		bldr.setTime(System.currentTimeMillis());
 
 		return bldr.build();
 	}

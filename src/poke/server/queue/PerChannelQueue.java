@@ -148,6 +148,7 @@ public class PerChannelQueue implements ChannelQueue {
 			return;
 
 		try {
+			logger.info("reply:" + reply);
 			outbound.put(reply);
 		} catch (InterruptedException e) {
 			logger.error("message not enqueued for reply", e);

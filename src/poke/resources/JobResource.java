@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
 import eye.Comm.Payload;
+import eye.Comm.PhotoPayload;
 import eye.Comm.Ping;
 import eye.Comm.PokeStatus;
 import eye.Comm.Request;
@@ -30,19 +31,29 @@ public class JobResource implements Resource {
 	@Override
 	public Request process(Request request) {
 		// TODO add code to process the message/event received
-		logger.info("poke: " + request.getBody().getPing().getTag());
+		logger.info("Header: " + request.getHeader());
+		//logger.info("request String: " + request.toString());
+		//logger.info("request: " + request);
+		
+		if(request.hasBody())
+		{
+			//logger.info("body:" + request.getBody());
+		}
 
 		Request.Builder rb = Request.newBuilder();
 
 		// metadata
-		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), PokeStatus.SUCCESS, null));
-
+		rb.setHeader(ResourceUtil.buildPhotoHeader(request));
+		
 		// payload
-		Payload.Builder pb = Payload.newBuilder();
-		Ping.Builder fb = Ping.newBuilder();
-		fb.setTag(request.getBody().getPing().getTag());
-		fb.setNumber(request.getBody().getPing().getNumber());
-		pb.setPing(fb.build());
+		PhotoPayload.Builder ppb= PhotoPayload.newBuilder();
+		//generate uuid
+		ppb.setUuid("Test1");
+		ppb.setName(request.getBody().getPhotoPayload().getName());
+		//ppb.setData("");
+		Payload.Builder pb=Payload.newBuilder();
+		pb.setPhotoPayload(ppb.build());
+		
 		rb.setBody(pb.build());
 
 		Request reply = rb.build();
