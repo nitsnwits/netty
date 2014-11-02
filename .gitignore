@@ -7,3 +7,4 @@ python/*.sh
 classes/
 python/comm_pb2.*
 generated/
+python/*.pyc

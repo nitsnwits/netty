@@ -101,7 +101,8 @@ class Client():
 			try:
 				self.channel.write(request.SerializeToString())
 				resp = Request()
-				resp.ParseFromString(self.channel.read())
+				print "Resp: " + str(resp)
+				resp = ParseFromString(self.channel.read())
 				return resp
 			except:
 				print sys.exc_info()[0]
