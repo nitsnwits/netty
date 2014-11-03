@@ -29,21 +29,15 @@ class SocketChannel():
 			raise Exception("Socked send failed. Closing.")
 	  
 	def read(self):
-		print "reading.."
 		lenField = self.readnbytes(4)
-		print "lenField: " + str(lenField)
 		length = struct.unpack('>L', lenField)[0]
-		print "length: " + str(length)
 		byteStream = self.readnbytes(length)
 		return byteStream
   
 	def readnbytes(self, n):
-		print "called readnbytes.."
 		buf = ''
 		while n > 0:
-			print "in the loop: "
 			data = self.sock.recv(n)
-			print "Data: " + str(data)
 			if data == '':
 				raise Exception("socket broken or connection closed")
 			buf += data
