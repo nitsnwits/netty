@@ -28,7 +28,7 @@ while client:
 		requestType = "photoCreateRequest"
 		# host = str(input("Enter host: "))
 		# port = int(input("Enter port: "))
-		inputimage= raw_input("\n\t\t\tEnter image file's absolute path: ")
+		inputimage= raw_input("\n\tEnter image file's absolute path: ")
 
 		#read the input image from the file system from the path.          
 		Client().executeOperation(requestType, host, port, inputimage)

@@ -51,7 +51,7 @@ class Client():
 		with open(param, 'rb') as image:
 			readImage = image.read()
 			readImageByteArray = bytearray(readImage)
-		print "req: " + str(request)
+		#print "req: " + str(request)
 		photoPayload.data = str(readImageByteArray)
 
 		#finish preparing the request
@@ -78,7 +78,7 @@ class Client():
 		if (response != None):
 			print "\n\t***** Response received from server *****\n"
 			print "\t RoutingID \t-> " + str(response.header.routing_id)
-			print "\t Originator \t->" + str(response.header.routing_id)
+			print "\t Originator \t->" + str(response.header.originator)
 			print "\t Data \t->" + str(response.body.photoPayload.data)
 		else:
 			print "\n\t***** No response received from server *****\n"
@@ -86,9 +86,9 @@ class Client():
 	def printPhotoCreateRequest(self, response):
 		if (response != None):
 			print "\n\t***** Response received from server *****\n"
-			print "\t RoutingID \t-> " + str(response.header.routing_id)
-			print "\t Originator \t->" + str(response.header.routing_id)
-			print "\t Photo UUID \t->" + str(response.body.photoPayload.uuid)	
+			print "\t RoutingID \t->\t" + str(response.header.routing_id)
+			print "\t Originator \t->\t" + str(response.header.originator)
+			print "\t Photo UUID \t->\t" + str(response.body.photoPayload.uuid)	
 		else:
 			print "\n\t***** No response received from server *****\n"
 					  
