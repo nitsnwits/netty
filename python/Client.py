@@ -99,7 +99,7 @@ class Client():
 				self.channel.write(request.SerializeToString())
 				print "\tConnected to channel and written message."
 				resp = Request()
-				resp = ParseFromString(self.channel.read())
+				resp.ParseFromString(self.channel.read())
 				return resp
 			except:
 				print "\tException occurred: " + str(sys.exc_info()[0])
