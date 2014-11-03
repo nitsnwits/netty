@@ -29,7 +29,12 @@ import com.google.protobuf.ByteString;
 
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
+import poke.server.resources.jobHandlers.CreateHandler;
+import poke.server.resources.jobHandlers.DeleteHandler;
+import poke.server.resources.jobHandlers.FailureHandler;
+import poke.server.resources.jobHandlers.FetchHandler;
 import eye.Comm.Payload;
+import eye.Comm.PhotoHeader.RequestType;
 import eye.Comm.PhotoPayload;
 import eye.Comm.Ping;
 import eye.Comm.PokeStatus;
@@ -43,46 +48,27 @@ public class JobResource implements Resource {
 		logger.info("Header: " + request.getHeader());
 		//logger.info("request String: " + request.toString());
 		//logger.info("request: " + request);
-		 
-		if(request.getBody().getPhotoPayload().hasData())
+		Request reply;
+		if(request.getHeader().getPhotoHeader().getRequestType()==RequestType.write)
 		{
-			ByteString bs=request.getBody().getPhotoPayload().getData();
-			byte[] buf = bs.toByteArray();
-		 
-			FileOutputStream fileOuputStream;
-			try {
-				fileOuputStream = new FileOutputStream("/Users/siddharthbhargava/Desktop/minion.jpg");
-				fileOuputStream.write(buf);
-				fileOuputStream.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-			
-			//logger.info("body:" + request.getBody());
+			CreateHandler ch=new CreateHandler();
+			reply=ch.handleRequest(request);
 		}
-
-		Request.Builder rb = Request.newBuilder();
-
-		// metadata
-		rb.setHeader(ResourceUtil.buildPhotoHeader(request));
-		
-		// payload
-		PhotoPayload.Builder ppb= PhotoPayload.newBuilder();
-		//generate uuid
-		ppb.setUuid("Test1");
-		ppb.setName(request.getBody().getPhotoPayload().getName());
-		//ppb.setData("");
-		Payload.Builder pb=Payload.newBuilder();
-		pb.setPhotoPayload(ppb.build());
-		
-		rb.setBody(pb.build());
-
-		Request reply = rb.build();
-
+		else if(request.getHeader().getPhotoHeader().getRequestType()==RequestType.read)
+		{
+			FetchHandler fh=new FetchHandler();
+			reply=fh.handleRequest(request);
+		}
+		else if(request.getHeader().getPhotoHeader().getRequestType()==RequestType.delete)
+		{
+			DeleteHandler dh= new DeleteHandler();
+			reply=dh.handleRequest(request);
+		}
+		else
+		{
+			FailureHandler fh=new FailureHandler();
+			reply=fh.handleRequest(request,"Invalid Job Requested, Cannot be Served");
+		}
 		return reply;
 	}
 

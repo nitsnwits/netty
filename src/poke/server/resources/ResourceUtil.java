@@ -15,6 +15,7 @@
  */
 package poke.server.resources;
 
+import java.util.Date;
 import java.util.List;
 
 import poke.server.conf.ServerConf;
@@ -96,14 +97,20 @@ public class ResourceUtil {
 
 		return bldr.build();
 	}
-	public static Header buildPhotoHeader(Request request) {
+	public static Header buildPhotoHeader(Request request, ResponseFlag rf, Date lastModified) {
 		Header.Builder bldr = Header.newBuilder();
 		bldr.setOriginator(ResourceFactory.getCfg().getNodeId());
 		bldr.setRoutingId(request.getHeader().getRoutingId());
 		PhotoHeader.Builder phb= PhotoHeader.newBuilder();
 		phb.setRequestType(request.getHeader().getPhotoHeader().getRequestType());
-		phb.setResponseFlag(ResponseFlag.success);
-
+		phb.setResponseFlag(rf);
+		if(lastModified!=null)
+			phb.setLastModified(lastModified.getTime());
+		else
+		{
+			Date timeStamp = new Date();
+			phb.setLastModified(timeStamp.getTime());
+		}
 		bldr.setTime(System.currentTimeMillis());
 
 		return bldr.build();
