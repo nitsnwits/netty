@@ -15,8 +15,17 @@
  */
 package poke.resources;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.h2.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.ByteString;
 
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
@@ -34,9 +43,25 @@ public class JobResource implements Resource {
 		logger.info("Header: " + request.getHeader());
 		//logger.info("request String: " + request.toString());
 		//logger.info("request: " + request);
-		
-		if(request.hasBody())
+		 
+		if(request.getBody().getPhotoPayload().hasData())
 		{
+			ByteString bs=request.getBody().getPhotoPayload().getData();
+			byte[] buf = bs.toByteArray();
+		 
+			FileOutputStream fileOuputStream;
+			try {
+				fileOuputStream = new FileOutputStream("/Users/siddharthbhargava/Desktop/minion.jpg");
+				fileOuputStream.write(buf);
+				fileOuputStream.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			
 			//logger.info("body:" + request.getBody());
 		}
 
