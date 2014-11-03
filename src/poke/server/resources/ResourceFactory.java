@@ -74,6 +74,7 @@ public class ResourceFactory {
 	 * @param route
 	 * @return
 	 */
+	
 	public Resource resourceInstance(Header header) {
 		// is the message for this server?
 		if (header.hasToNode()) {
@@ -96,5 +97,13 @@ public class ResourceFactory {
 			logger.error("unable to create resource " + rc.getClazz());
 			return null;
 		}
+	}
+
+	public static ServerConf getCfg() {
+		return cfg;
+	}
+
+	public static void setCfg(ServerConf cfg) {
+		ResourceFactory.cfg = cfg;
 	}
 }

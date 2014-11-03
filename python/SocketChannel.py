@@ -23,13 +23,12 @@ class SocketChannel():
 		streamLen = struct.pack('>L', len(byteStream))
 		framedStream = streamLen + byteStream
 		try:
-		  self.sock.sendall(framedStream)
+			self.sock.sendall(framedStream)
 		except socket.error:
-		  self.close()
-		  raise Exception("Socked send failed. Closing.")
+			self.close()
+			raise Exception("Socked send failed. Closing.")
 	  
 	def read(self):
-	
 		lenField = self.readnbytes(4)
 		length = struct.unpack('>L', lenField)[0]
 		byteStream = self.readnbytes(length)
@@ -38,11 +37,11 @@ class SocketChannel():
 	def readnbytes(self, n):
 		buf = ''
 		while n > 0:
-		  data = self.sock.recv(n)
-		  if data == '':
-			raise Exception("socket broken or connection closed")
-		  buf += data
-		  n -= len(data)
+			data = self.sock.recv(n)
+			if data == '':
+				raise Exception("socket broken or connection closed")
+			buf += data
+			n -= len(data)
 		return buf
 
 	def close(self):

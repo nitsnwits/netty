@@ -148,6 +148,7 @@ public class PerChannelQueue implements ChannelQueue {
 			return;
 
 		try {
+			logger.info("reply:" + reply);
 			outbound.put(reply);
 		} catch (InterruptedException e) {
 			logger.error("message not enqueued for reply", e);
@@ -177,6 +178,7 @@ public class PerChannelQueue implements ChannelQueue {
 			}
 
 			while (true) {
+				PerChannelQueue.logger.info("Forever:" + forever + "outbound queue size: "+ sq.outbound.size());
 				if (!forever && sq.outbound.size() == 0)
 					break;
 
@@ -186,7 +188,7 @@ public class PerChannelQueue implements ChannelQueue {
 					if (conn.isWritable()) {
 						boolean rtn = false;
 						if (channel != null && channel.isOpen() && channel.isWritable()) {
-							ChannelFuture cf = channel.write(msg);
+							ChannelFuture cf = channel.writeAndFlush(msg);
 
 							// blocks on write - use listener to be async
 							cf.awaitUninterruptibly();

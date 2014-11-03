@@ -19,13 +19,13 @@ class Client():
 		if option == "photoCreateRequest":
 			#Create a request for sending an image to server
 			request = self.preparePhotoCreateRequest(param)
-			print "Preparing POST /photo request for server (" + str(host) + ":" + str(port) +")"
+			print "\n\tPreparing POST /photo request for server (" + str(host) + ":" + str(port) +")"
 			response = self.send(host, port, request)
 			self.printPhotoCreateRequest(response)
 		elif option == "photoReadRequest":
 			#Create a request for retreiving an image from server
 			request = self.preparePhotoReadRequest(param)
-			print "Preparing GET /photo request for server (" + str(host) + ":" + str(port) + ")"
+			print "\n\tPreparing GET /photo request for server (" + str(host) + ":" + str(port) + ")"
 			response = self.send(host, port, request)
 			self.printPhotoReadRequest(response)
 
@@ -75,35 +75,33 @@ class Client():
 
 
 	def printPhotoReadRequest(self, response):
-		print "\n***** Response received from server *****\n"
-		print "\t RoutingID \t-> " + str(response.header.routing_id)
-		print "\t Originator \t->" + str(response.header.routing_id)
-		print "\t Data \t->" + str(response.body.photoPayload.data)
+		if (response != None):
+			print "\n\t***** Response received from server *****\n"
+			print "\t RoutingID \t-> " + str(response.header.routing_id)
+			print "\t Originator \t->" + str(response.header.routing_id)
+			print "\t Data \t->" + str(response.body.photoPayload.data)
+		else:
+			print "\n\t***** No response received from server *****\n"
 
 	def printPhotoCreateRequest(self, response):
-		print "\n***** Response received from server *****\n"
-		print "\t RoutingID \t-> " + str(response.header.routing_id)
-		print "\t Originator \t->" + str(response.header.routing_id)
-		print "\t Photo UUID \t->" + str(response.body.photoPayload.uuid)		
-  
-  # def printPingRequest(self, resp):
-	 #  print "\n==Response Received from Server==\n"
-	 #  print "RoutingID - " + str(resp.header.routing_id)
-	 #  print "Originator - " + str(resp.header.originator)
-	 #  print "Ping Number - " + str(resp.body.ping.number)
-	 #  print "Ping Tag - " + str(resp.body.ping.tag)
-
+		if (response != None):
+			print "\n\t***** Response received from server *****\n"
+			print "\t RoutingID \t-> " + str(response.header.routing_id)
+			print "\t Originator \t->" + str(response.header.routing_id)
+			print "\t Photo UUID \t->" + str(response.body.photoPayload.uuid)	
+		else:
+			print "\n\t***** No response received from server *****\n"
 					  
 	def send(self, host, port, request):
 		self.channel = self.channelFactory.openChannel(host, port)
 		while self.channel.connected:
-			print "Channel Connected..."
 			try:
 				self.channel.write(request.SerializeToString())
+				print "\tConnected to channel and written message."
 				resp = Request()
-				resp.ParseFromString(self.channel.read())
+				resp = ParseFromString(self.channel.read())
 				return resp
 			except:
-				print sys.exc_info()[0]
+				print "\tException occurred: " + str(sys.exc_info()[0])
 			finally:
 				self.channel.close()
