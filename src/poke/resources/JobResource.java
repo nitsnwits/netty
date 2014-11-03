@@ -20,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import com.mongodb.*;
+import com.mongodb.gridfs.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,15 +45,35 @@ public class JobResource implements Resource {
 		byte[] b = a.toByteArray();
 		String s = a.toString();
 		
+		try
+	     {
+		Mongo mongo = new Mongo("127.0.0.1", 27017);
+        String dbName = "ImageDB";
+        DB db = mongo.getDB( dbName );
+        //Create GridFS object
+        GridFS fs = new GridFS( db );
+        //Save image into database
+        GridFSInputFile in = fs.createFile( b );
+        in.setFilename(request.getBody().getPhotoPayload().getName());
+        in.save();
+        System.out.println("Image saved in DB");
+        //Find saved image
+        GridFSDBFile out = fs.findOne( new BasicDBObject( "_id" , in.getId() ) );
+	    
 		
-		String strFilePath = "/home/jaymit/"+request.getBody().getPhotoPayload().getName();
+        //Save loaded image from database into new image file
+      //  FileOutputStream outputImage = new FileOutputStream("/home/jaymit/Documents/"+request.getBody().getPhotoPayload().getName());
+      //  out.writeTo( outputImage );
+        //outputImage.close();
+		
+		/*String strFilePath = "/home/jaymit/"+request.getBody().getPhotoPayload().getName();
 		
 		 try
-	     {
-	      FileOutputStream fos = new FileOutputStream(strFilePath);
+	     {*/
+	      FileOutputStream fos = new FileOutputStream("/home/jaymit/Documents/"+request.getBody().getPhotoPayload().getName());
 	    
 	     
-	       fos.write(b);
+	       out.writeTo(fos);
 	   
 	     
 	       fos.close();
@@ -65,7 +87,7 @@ public class JobResource implements Resource {
 	     {
 	      System.out.println("IOException : " + ioe);
 	     }
-		System.out.println(s);
+		//System.out.println(s);
 		
 		
 		logger.info("poke: " + request.getHeader());
