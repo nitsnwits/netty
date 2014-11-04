@@ -28,17 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
-<<<<<<< HEAD
-=======
-import poke.server.resources.jobHandlers.CreateHandler;
-import poke.server.resources.jobHandlers.DeleteHandler;
-import poke.server.resources.jobHandlers.FailureHandler;
-import poke.server.resources.jobHandlers.FetchHandler;
-import eye.Comm.Payload;
-import eye.Comm.PhotoHeader.RequestType;
->>>>>>> 179a422185e710dc8ccf2465dfc4da8da25d8701
 import eye.Comm.PhotoPayload;
-import eye.Comm.Payload;
 import eye.Comm.JobOperation;
 import eye.Comm.Ping;
 import eye.Comm.PokeStatus;
@@ -49,7 +39,6 @@ public class JobResource implements Resource {
 	@Override
 	public Request process(Request request) {
 		// TODO add code to process the message/event received
-<<<<<<< HEAD
 		//logger.info("poke: " + request.getBody().getPhotoPayload().data);
 		
 		com.google.protobuf.ByteString a = request.getBody().getPhotoPayload().getData();
@@ -116,32 +105,6 @@ public class JobResource implements Resource {
 
 		Request reply = rb.build();
 
-=======
-		logger.info("Header: " + request.getHeader());
-		//logger.info("request String: " + request.toString());
-		//logger.info("request: " + request);
-		Request reply;
-		if(request.getHeader().getPhotoHeader().getRequestType()==RequestType.write)
-		{
-			CreateHandler ch=new CreateHandler();
-			reply=ch.handleRequest(request);
-		}
-		else if(request.getHeader().getPhotoHeader().getRequestType()==RequestType.read)
-		{
-			FetchHandler fh=new FetchHandler();
-			reply=fh.handleRequest(request);
-		}
-		else if(request.getHeader().getPhotoHeader().getRequestType()==RequestType.delete)
-		{
-			DeleteHandler dh= new DeleteHandler();
-			reply=dh.handleRequest(request);
-		}
-		else
-		{
-			FailureHandler fh=new FailureHandler();
-			reply=fh.handleRequest(request,"Invalid Job Requested, Cannot be Served");
-		}
->>>>>>> 179a422185e710dc8ccf2465dfc4da8da25d8701
 		return reply;
 	}
 
