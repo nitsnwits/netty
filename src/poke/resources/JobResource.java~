@@ -20,24 +20,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import com.mongodb.*;
+import com.mongodb.gridfs.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.h2.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.protobuf.ByteString;
-
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
-import eye.Comm.Payload;
-import eye.Comm.JobOperation;
 import eye.Comm.PhotoPayload;
+import eye.Comm.JobOperation;
 import eye.Comm.Ping;
 import eye.Comm.PokeStatus;
 import eye.Comm.Request;
@@ -53,28 +45,36 @@ public class JobResource implements Resource {
 		byte[] b = a.toByteArray();
 		String s = a.toString();
 		
+		try
+	     {
+		Mongo mongo = new Mongo("127.0.0.1", 27017);
+        String dbName = "ImageDB";
+        DB db = mongo.getDB( dbName );
+        //Create GridFS object
+        GridFS fs = new GridFS( db );
+        //Save image into database
+        GridFSInputFile in = fs.createFile( b );
+        in.setFilename(request.getBody().getPhotoPayload().getName());
+        in.save();
+        System.out.println("Image saved in DB");
+        //Find saved image
+        GridFSDBFile out = fs.findOne( new BasicDBObject( "_id" , in.getId() ) );
+	    
 		
-		String strFilePath = "/home/jaymit/"+request.getBody().getPhotoPayload().getName();
+        //Save loaded image from database into new image file
+      //  FileOutputStream outputImage = new FileOutputStream("/home/jaymit/Documents/"+request.getBody().getPhotoPayload().getName());
+      //  out.writeTo( outputImage );
+        //outputImage.close();
+		
+		/*String strFilePath = "/home/jaymit/"+request.getBody().getPhotoPayload().getName();
 		
 		 try
-	     {
-	      FileOutputStream fos = new FileOutputStream(strFilePath);
-	      //	String strContent = "Write File using Java FileOutputStream example !";
-	         
-	      /*
-	       * To write byte array to a file, use
-	       * void write(byte[] bArray) method of Java FileOutputStream class.
-	       *
-	       * This method writes given byte array to a file.
-	       */
+	     {*/
+	      FileOutputStream fos = new FileOutputStream("/home/jaymit/Documents/"+request.getBody().getPhotoPayload().getName());
+	    
 	     
-	       fos.write(b);
-	     
-	      /*
-	       * Close FileOutputStream using,
-	       * void close() method of Java FileOutputStream class.
-	       *
-	       */
+	       out.writeTo(fos);
+	   
 	     
 	       fos.close();
 	     
@@ -87,72 +87,25 @@ public class JobResource implements Resource {
 	     {
 	      System.out.println("IOException : " + ioe);
 	     }
-		System.out.println(s);
-		/*OutputStream os = new FileOutputStream("/home/jaymit/sjsu.jpg");
-	    os.write(b);
-	    os.close();*/
-		
-		logger.info("poke: " + request.getHeader());
-		logger.info("poke: " + PokeStatus.SUCCESS);
-		logger.info("Header: " + request.getHeader());
-		//logger.info("request String: " + request.toString());
-		//logger.info("request: " + request);
-		 
-		if(request.getBody().getPhotoPayload().hasData())
-		{
-			ByteString bs=request.getBody().getPhotoPayload().getData();
-			byte[] buf = bs.toByteArray();
-		 
-			FileOutputStream fileOuputStream;
-			try {
-				fileOuputStream = new FileOutputStream("/Users/siddharthbhargava/Desktop/minion.jpg");
-				fileOuputStream.write(buf);
-				fileOuputStream.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-			
-			//logger.info("body:" + request.getBody());
-		}
-
 		Request.Builder rb = Request.newBuilder();
 
 		// metadata
 		rb.setHeader(ResourceUtil.buildPhotoHeader(request));
 		
 		// payload
-		Payload.Builder pb = Payload.newBuilder();
-		JobOperation.Builder fb = JobOperation.newBuilder();
-		
-	    //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    //Message message = (Message) pb;
-	    //byte[] name = pb.getPhotoPayload().getData().getBytes();
-	    //baos.write(name);
-	    //System.out.println(name);
-		
-		//fb.setData(request.getBody().getJobOp().getData());
-		//fb.setNumber(request.getBody().getPing().getNumber());
-		//pb.setPing(fb.build());
-		//rb.setBody(pb.build());
-		//logger.info("poke: " + request.getBody().getJobOp().getNameBytes());
-		//Request reply = rb.build();
 		PhotoPayload.Builder ppb= PhotoPayload.newBuilder();
 		//generate uuid
 		ppb.setUuid("Test1");
 		ppb.setName(request.getBody().getPhotoPayload().getName());
 		//ppb.setData("");
-//		Payload.Builder pb=Payload.newBuilder();
+		Payload.Builder pb=Payload.newBuilder();
 		pb.setPhotoPayload(ppb.build());
 		
 		rb.setBody(pb.build());
 
 		Request reply = rb.build();
 
-		return null;
+		return reply;
 	}
 
 }

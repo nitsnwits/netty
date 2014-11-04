@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
+import eye.Comm.PhotoPayload;
 import eye.Comm.Payload;
 import eye.Comm.JobOperation;
 import eye.Comm.Ping;
@@ -87,34 +88,25 @@ public class JobResource implements Resource {
 	     {
 	      System.out.println("IOException : " + ioe);
 	     }
-		//System.out.println(s);
-		
-		
-		logger.info("poke: " + request.getHeader());
-		logger.info("poke: " + PokeStatus.SUCCESS);
 		Request.Builder rb = Request.newBuilder();
 
 		// metadata
-		//rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), PokeStatus.SUCCESS, null));
-
+		rb.setHeader(ResourceUtil.buildPhotoHeader(request));
+		
 		// payload
-		//Payload.Builder pb = Payload.newBuilder();
-		//JobOperation.Builder fb = JobOperation.newBuilder();
+		PhotoPayload.Builder ppb= PhotoPayload.newBuilder();
+		//generate uuid
+		ppb.setUuid("Test1");
+		ppb.setName(request.getBody().getPhotoPayload().getName());
+		//ppb.setData("");
+		Payload.Builder pb=Payload.newBuilder();
+		pb.setPhotoPayload(ppb.build());
 		
-	    //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    //Message message = (Message) pb;
-	    //byte[] name = pb.getPhotoPayload().getData().getBytes();
-	    //baos.write(name);
-	    //System.out.println(name);
-		
-		//fb.setData(request.getBody().getJobOp().getData());
-		//fb.setNumber(request.getBody().getPing().getNumber());
-		//pb.setPing(fb.build());
-		//rb.setBody(pb.build());
-		//logger.info("poke: " + request.getBody().getJobOp().getNameBytes());
-		//Request reply = rb.build();
+		rb.setBody(pb.build());
 
-		return null;
+		Request reply = rb.build();
+
+		return reply;
 	}
 
 }
