@@ -178,23 +178,38 @@ public class PerChannelQueue implements ChannelQueue {
 			}
 
 			while (true) {
-				PerChannelQueue.logger.info("Forever:" + forever + "outbound queue size: "+ sq.outbound.size());
+				//PerChannelQueue.logger.info("Forever:" + forever + "outbound queue size: "+ sq.outbound.size());
 				if (!forever && sq.outbound.size() == 0)
 					break;
 
 				try {
 					// block until a message is enqueued
 					GeneratedMessage msg = sq.outbound.take();
+					final GeneratedMessage cfMsg = msg; //to put for channel future failure
 					if (conn.isWritable()) {
 						boolean rtn = false;
 						if (channel != null && channel.isOpen() && channel.isWritable()) {
 							ChannelFuture cf = channel.writeAndFlush(msg);
 
+							//to provide non-blocking functionality for channel write
+							cf.addListener(new ChannelFutureListener(){
+								public void operationComplete(ChannelFuture future) throws Exception {
+									//check if operation was successfull
+									if(future.isSuccess()) {
+										logger.info("Written to channel successfully");
+									} else {
+										sq.outbound.putFirst(cfMsg);
+									}
+								}
+							});
+
+							/*
 							// blocks on write - use listener to be async
 							cf.awaitUninterruptibly();
 							rtn = cf.isSuccess();
 							if (!rtn)
 								sq.outbound.putFirst(msg);
+							 */
 						}
 
 					} else

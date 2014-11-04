@@ -22,12 +22,20 @@ class Client():
 			print "\n\tPreparing POST /photo request for server (" + str(host) + ":" + str(port) +")"
 			response = self.send(host, port, request)
 			self.printPhotoCreateRequest(response)
+
 		elif option == "photoReadRequest":
 			#Create a request for retreiving an image from server
 			request = self.preparePhotoReadRequest(param)
 			print "\n\tPreparing GET /photo request for server (" + str(host) + ":" + str(port) + ")"
 			response = self.send(host, port, request)
 			self.printPhotoReadRequest(response)
+
+		elif option == "photoDeleteRequest":
+			#Create a request for delete an image on server
+			request = self.preparePhotoDeleteRequest(param)
+			print "\n\tPreparing DELETE /photo request for server (" + str(host) + ":" + str(port) + ")"
+			response = self.send(host, port, request)
+			self.printPhotoDeleteRequest(response)			
 
 	def preparePhotoCreateRequest(self, param):
 		request = Request()
@@ -51,7 +59,7 @@ class Client():
 		with open(param, 'rb') as image:
 			readImage = image.read()
 			readImageByteArray = bytearray(readImage)
-		print "req: " + str(request)
+		#print "req: " + str(request)
 		photoPayload.data = str(readImageByteArray)
 
 		#finish preparing the request
@@ -64,6 +72,7 @@ class Client():
 		header = request.header
 		header.routing_id = comm_pb2.Header.JOBS
 		header.originator = 1
+		header.photoHeader.requestType = comm_pb2.PhotoHeader.read
 
 		#set body for the request
 		body = request.body
@@ -73,24 +82,61 @@ class Client():
 		#finish preparing the request
 		return request
 
+	def preparePhotoDeleteRequest(self, param):
+		request = Request()
+
+		#set headers for the request
+		header = request.header
+		header.routing_id = comm_pb2.Header.JOBS
+		header.originator = 1
+		header.photoHeader.requestType = comm_pb2.PhotoHeader.delete
+
+		#set body for the request
+		body = request.body
+		photoPayload = body.photoPayload
+		photoPayload.uuid = str(param)
+
+		#finish preparing the request
+		return request		
+
 
 	def printPhotoReadRequest(self, response):
 		if (response != None):
-			print "\n\t***** Response received from server *****\n"
-			print "\t RoutingID \t-> " + str(response.header.routing_id)
-			print "\t Originator \t->" + str(response.header.routing_id)
-			print "\t Data \t->" + str(response.body.photoPayload.data)
+			if (response.header.photoHeader.responseFlag == 0):
+				print "\n\t***** Response received from server *****\n"
+				print "\t RoutingID \t->\t" + str(response.header.routing_id)
+				print "\t Originator \t->\t" + str(response.header.originator)
+				print "\t Response Code \t->\t" + "Success"
+				print "\t Data \t->\t" + str(response.body.photoPayload.data)
+			else:
+				print "\t Response Code \t->\t" + "Unable to fulfill read request."
 		else:
 			print "\n\t***** No response received from server *****\n"
 
 	def printPhotoCreateRequest(self, response):
 		if (response != None):
-			print "\n\t***** Response received from server *****\n"
-			print "\t RoutingID \t-> " + str(response.header.routing_id)
-			print "\t Originator \t->" + str(response.header.routing_id)
-			print "\t Photo UUID \t->" + str(response.body.photoPayload.uuid)	
+			if (response.header.photoHeader.responseFlag == 0):
+				print "\n\t***** Response received from server *****\n"
+				print "\t RoutingID \t->\t" + str(response.header.routing_id)
+				print "\t Originator \t->\t" + str(response.header.originator)
+				print "\t Response Code \t->\t" + "Success"
+				print "\t Photo UUID \t->\t" + str(response.body.photoPayload.uuid)	
+			else:
+				print "\t Response Code \t->\t" + "Unable to fulfill create request."
 		else:
 			print "\n\t***** No response received from server *****\n"
+
+	def printPhotoDeleteRequest(self, response):
+		if (response != None):
+			if (response.header.photoHeader.responseFlag == 0):
+				print "\n\t***** Response received from server *****\n"
+				print "\t RoutingID \t->\t" + str(response.header.routing_id)
+				print "\t Originator \t->\t" + str(response.header.originator)
+				print "\t Response Code \t->\t" + "Success"
+			else:
+				print "\t Response Code \t->\t" + "Unable to fulfill delete request."
+		else:
+			print "\n\t***** No response received from server *****\n"			
 					  
 	def send(self, host, port, request):
 		self.channel = self.channelFactory.openChannel(host, port)
