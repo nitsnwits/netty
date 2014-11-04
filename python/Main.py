@@ -12,7 +12,6 @@ port = int(raw_input("\tEnter port: "))
 
 client = True #client start up.
 while client:
-	print "\n ***** Welcome to Lifeforce MOOC backbone client. ***** \n"
 	print "\tPlease choose from the following options: \n"
 	print "\t\t 1. Upload an image to the server."
 	print "\t\t 2. Retrieve an image from the server."
