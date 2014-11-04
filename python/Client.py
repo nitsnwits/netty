@@ -103,11 +103,17 @@ class Client():
 	def printPhotoReadRequest(self, response):
 		if (response != None):
 			if (response.header.photoHeader.responseFlag == 0):
+				path = raw_input("\tEnter Path to store Image: ")
 				print "\n\t***** Response received from server *****\n"
 				print "\t RoutingID \t->\t" + str(response.header.routing_id)
 				print "\t Originator \t->\t" + str(response.header.originator)
 				print "\t Response Code \t->\t" + "Success"
-				print "\t Data \t->\t" + str(response.body.photoPayload.data)
+				#print "\t Data \t->\t" + str(response.body.photoPayload.data)
+				name = path + str(response.body.photoPayload.name)
+				data = str(response.body.photoPayload.data)
+				fo = open(name, "wb")
+				fo.write(data)
+				fo.close()
 			else:
 				print "\t Response Code \t->\t" + "Unable to fulfill read request."
 		else:
