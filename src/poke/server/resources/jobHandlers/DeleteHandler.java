@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import poke.server.resources.ResourceUtil;
+import poke.server.storage.mongo.Operations;
 import poke.util.UUIDGenerator;
 
 import com.google.protobuf.ByteString;
@@ -24,23 +25,11 @@ public class DeleteHandler
 		if(request.getBody().getPhotoPayload().hasUuid())
 		{
 			UUID uuid = UUID.fromString(request.getBody().getPhotoPayload().getUuid());
-//			//byte[] buf = bs.toByteArray();
-//
-//			FileOutputStream fileOuputStream;
-//			try 
-//			{
-//				fileOuputStream = new FileOutputStream("/Users/siddharthbhargava/Desktop/minion.jpg");
-//				fileOuputStream.write(buf);
-//				fileOuputStream.close();
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-
-			//logger.info("body:" + request.getBody());
+//			
+			
+			//deleting file
+			Operations mongoOps= new Operations();
+			mongoOps.deletePhoto(uuid);
 
 
 
