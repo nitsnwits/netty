@@ -103,17 +103,21 @@ class Client():
 	def printPhotoReadRequest(self, response):
 		if (response != None):
 			if (response.header.photoHeader.responseFlag == 0):
-				path = raw_input("\tEnter Path to store Image: ")
-				print "\n\t***** Response received from server *****\n"
-				print "\t RoutingID \t->\t" + str(response.header.routing_id)
-				print "\t Originator \t->\t" + str(response.header.originator)
-				print "\t Response Code \t->\t" + "Success"
-				#print "\t Data \t->\t" + str(response.body.photoPayload.data)
-				name = path + str(response.body.photoPayload.name)
-				data = str(response.body.photoPayload.data)
-				fo = open(name, "wb")
-				fo.write(data)
-				fo.close()
+				path = raw_input("\n\tEnter Path to store image: ")
+				if (os.path.exists(path) == True and path[-1] == '/'):
+					path = os.path.abspath(path)
+					name = path + str(response.body.photoPayload.name)
+					data = str(response.body.photoPayload.data)
+					fo = open(name, "wb")
+					fo.write(data)
+					fo.close()
+					print "\n\t***** Response received from server *****\n"
+					print "\t RoutingID \t->\t" + str(response.header.routing_id)
+					print "\t Originator \t->\t" + str(response.header.originator)
+					print "\t Response Code \t->\t" + "Success"
+					#print "\t Data \t->\t" + str(response.body.photoPayload.data)
+				else:
+					print "\n\tUser Error: Invalid path entered."
 			else:
 				print "\t Response Code \t->\t" + "Unable to fulfill read request."
 		else:
