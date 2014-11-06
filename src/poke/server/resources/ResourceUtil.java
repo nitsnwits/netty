@@ -111,6 +111,7 @@ public class ResourceUtil {
 			Date timeStamp = new Date();
 			phb.setLastModified(timeStamp.getTime());
 		}
+		bldr.setPhotoHeader(phb);
 		bldr.setTime(System.currentTimeMillis());
 
 		return bldr.build();
