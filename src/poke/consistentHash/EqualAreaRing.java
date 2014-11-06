@@ -72,7 +72,7 @@ public class EqualAreaRing extends DataRing {
 		
 		int j=0;
 		for(int i=0; i<numNodes; i++){
-			System.out.println("--------------------");
+			//System.out.println("--------------------");
 			if(i==numNodes-1){
 				j=-1;
 			}else{
@@ -82,10 +82,10 @@ public class EqualAreaRing extends DataRing {
 			List<DataNode> nodeList = rangeMap.get(keyRange);
 			j++;
 			nodeList.add(nodes.get(j));
-			System.out.println("Node Id is one-->"+j);
+			//System.out.println("Node Id is one-->"+j);
 			j++;
 			nodeList.add(nodes.get(j));
-			System.out.println("Node Id is two-->"+j);
+			//System.out.println("Node Id is two-->"+j);
 		}
 	}
 	
