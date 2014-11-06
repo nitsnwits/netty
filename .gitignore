@@ -8,13 +8,11 @@ classes/
 python/comm_pb2.*
 generated/
 python/*.pyc
-
 build_pb.sh
-
 runtime/triangle/navya.conf
-
-build_pb.sh
-
 python/Client.pyc
-
 python/SocketChannel.pyc
+python/Main.pyc
+comm_pb2.py
+.DS_Store
+python/build_pb.sh.old
