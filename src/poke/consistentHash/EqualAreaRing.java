@@ -45,7 +45,8 @@ public class EqualAreaRing extends DataRing {
 			// Create physical node first, who will own this data node
 			PhysicalNode pn = new PhysicalNode();
 			pn.setId(i);
-			//pn.setHeterogeneity(conf.findById(i).getHeterogeneity());
+			//Uncomment this when running a whole server, this should work then
+			//pn.setHeterogeneity(conf.getHeterogeneity());
 			pn.setHeterogeneity(3); //hard code for testing
 			
 			//create data nodes equal to the physical node's heterogeneity
