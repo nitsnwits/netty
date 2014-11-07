@@ -132,7 +132,7 @@ public class EqualAreaRing extends DataRing {
 	}
 	
 	//get the physical node id based on the key
-	public int getPhyNode(String key){
+	public int getPhysicalNode(String key){
 		int dnId  = getDataNodeId(key);
 		int pnId = nodeMap.get(dnId);
 		
@@ -154,7 +154,7 @@ public class EqualAreaRing extends DataRing {
 			}
 	
 			System.out.println("----------------------");
-			getPhyNode(UUIDGenerator.get().toString());
+			getPhysicalNode(UUIDGenerator.get().toString());
 
 		} catch (Exception e) {
 		}
