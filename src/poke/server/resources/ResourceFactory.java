@@ -21,8 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.client.ClientCommand;
+import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
 import poke.server.conf.ServerConf.ResourceConf;
+import poke.server.managers.HeartbeatData;
 import eye.Comm.Header;
 
 /**
@@ -75,16 +78,9 @@ public class ResourceFactory {
 	 * @return
 	 */
 	
-	public Resource resourceInstance(Header header) {
+	public Resource resourceInstance(Header header) 
+	{
 		// is the message for this server?
-		if (header.hasToNode()) {
-			if (cfg.getNodeId() == header.getToNode())
-				; // fall through and process normally
-			else {
-				// forward request
-			}
-		}
-
 		ResourceConf rc = cfg.findById(header.getRoutingId().getNumber());
 		if (rc == null)
 			return null;
@@ -106,4 +102,48 @@ public class ResourceFactory {
 	public static void setCfg(ServerConf cfg) {
 		ResourceFactory.cfg = cfg;
 	}
+
+	public boolean needToRoute(Header header) {
+		int determinedNode=-1;
+		int destHop=-1;
+		if (!header.hasToNode()) {
+			// Determine node with hashing
+			// Uncomment next line to enable pinging to determined node.
+			determinedNode =1;
+		}					
+		if (header.hasToNode())
+			destHop=header.getToNode();
+		else
+			destHop=determinedNode;
+		if (cfg.getNodeId() != destHop)
+			return true;
+		else
+			return false;
+	}
+
+	public NodeDesc getDeterminedNode(Header header) 
+	{
+		int determinedNode=-1;
+		int destHop=-1;
+		if (!header.hasToNode()) 
+		{
+			// Determine node with hashing
+			// Uncomment next line to enable pinging to determined node.
+			determinedNode =1;
+		}					
+		if (header.hasToNode())
+			destHop=header.getToNode();
+		else
+			destHop=determinedNode;
+		
+		for (NodeDesc nn : cfg.getAdjacent().getAdjacentNodes().values()) 
+		{
+			if(nn.getNodeId()==destHop)
+			{
+				return nn;
+			}
+		}
+		return null;
+	}
+
 }

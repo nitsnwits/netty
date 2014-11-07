@@ -25,6 +25,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.client.ClientCommand;
+import poke.server.conf.NodeDesc;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceFactory;
 import poke.server.resources.ResourceUtil;
@@ -263,28 +265,40 @@ public class PerChannelQueue implements ChannelQueue {
 						Request req = ((Request) msg);
 
 						// do we need to route the request?
-
-						// handle it locally
-						Resource rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
-
+						boolean needToRoute= ResourceFactory.getInstance().needToRoute(req.getHeader());
 						Request reply = null;
-						if (rsc == null) {
-							logger.error("failed to obtain resource for " + req);
-							reply = ResourceUtil.buildError(req.getHeader(), PokeStatus.NORESOURCE,
-									"Request not processed");
-						} else
-							reply = rsc.process(req);
+						if(!needToRoute)
+						{
+							// handle it locally
+							Resource rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
+
+
+							if (rsc == null) {
+								logger.error("failed to obtain resource for " + req);
+								reply = ResourceUtil.buildError(req.getHeader(), PokeStatus.NORESOURCE,
+										"Request not processed");
+							} else
+								reply = rsc.process(req);
+						}
+						else
+						{
+							NodeDesc destinationNode = ResourceFactory.getInstance().getDeterminedNode(req.getHeader());
+							ClientCommand destHop=new ClientCommand(destinationNode.getHost(), destinationNode.getPort());
+							//destHop.poke("from Server 0", 0);
+							destHop.forwardJob(req,destinationNode.getNodeId());
+							
+						}
 
 						sq.enqueueResponse(reply, null);
 					}
 
 				} catch (InterruptedException ie) {
 					break;
-				} catch (UninitializedMessageException ume){
+				} /*catch (UninitializedMessageException ume){
 					System.out.println("Kuch bhi ayega toh pata chalega");
 					logger.info("Fields details: " + ume.getMissingFields());
 					break;
-				} catch (Exception e) {
+				} */catch (Exception e) {
 					PerChannelQueue.logger.error("Unexpected processing failure", e);
 					break;
 				}

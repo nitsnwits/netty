@@ -21,6 +21,7 @@ import java.util.List;
 import poke.server.conf.ServerConf;
 import eye.Comm.Header;
 import eye.Comm.Header.Routing;
+import eye.Comm.Payload;
 import eye.Comm.PhotoHeader;
 import eye.Comm.PhotoHeader.RequestType;
 import eye.Comm.PhotoHeader.ResponseFlag;
@@ -92,6 +93,8 @@ public class ResourceUtil {
 		Request.Builder bldr = Request.newBuilder();
 		Header hdr = buildHeaderFrom(reqHeader, status, statusMsg);
 		bldr.setHeader(hdr);
+		Payload.Builder pd= Payload.newBuilder();
+		bldr.setBody(pd.build());
 
 		// TODO add logging
 
