@@ -297,5 +297,10 @@ public class ServerConf {
 		public void setEnabled(boolean enabled) {
 			this.enabled = enabled;
 		}
+
+		public int getHeterogeneity() {
+			// TODO Auto-generated method stub
+			return 3;
+		}
 	}
 }

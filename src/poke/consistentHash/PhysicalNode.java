@@ -7,6 +7,8 @@ public class PhysicalNode {
 	private List<DataNode> owns = new ArrayList<DataNode>();
 	private List<DataNode> replica = new ArrayList<DataNode>();
 	private List<HandoffNode> handoff = new ArrayList<HandoffNode>();
+	private int id;
+	private int heterogeneity;
 
 	public void addOwned(DataNode dn) {
 		owns.add(dn);
@@ -44,6 +46,22 @@ public class PhysicalNode {
 
 	public void setHandoff(List<HandoffNode> handoff) {
 		this.handoff = handoff;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getHeterogeneity() {
+		return heterogeneity;
+	}
+
+	public void setHeterogeneity(int heterogeneity) {
+		this.heterogeneity = heterogeneity;
 	}
 
 }
