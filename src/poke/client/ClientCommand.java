@@ -95,9 +95,31 @@ public class ClientCommand {
 		eye.Comm.Request req = r.build();
 
 		try {
+			System.out.println("Ping Request: " +req);
 			comm.sendMessage(req);
 		} catch (Exception e) {
 			logger.warn("Unable to deliver message, queuing");
 		}
+	}
+
+	public void forwardJob(Request req, int destNodeId) 
+	{
+		Request.Builder r = Request.newBuilder();
+		Header.Builder h=Header.newBuilder();
+		r.setBody(req.getBody());
+		h.setToNode(destNodeId);
+		h.setRoutingId(req.getHeader().getRoutingId());
+		h.setPhotoHeader(req.getHeader().getPhotoHeader());
+		h.setOriginator(req.getHeader().getOriginator());
+		
+		r.setHeader(h.build());
+		Request fwdReq=r.build();
+		try {
+			System.out.println("forwarded job Request: " +fwdReq);
+			comm.sendMessage(fwdReq);
+			} catch (Exception e) {
+			logger.warn("Unable to deliver message, queuing");
+		}
+		
 	}
 }

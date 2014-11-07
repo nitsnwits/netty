@@ -45,10 +45,10 @@ public class CommHandler extends SimpleChannelInboundHandler<eye.Comm.Request> {
 	 * @param msg
 	 * @return
 	 */
-	public boolean send(GeneratedMessage msg) {
+	public boolean send(GeneratedMessage msg, Channel ch) {
 		// TODO a queue is needed to prevent overloading of the socket
 		// connection. For the demonstration, we don't need it
-		ChannelFuture cf = channel.write(msg);
+		ChannelFuture cf = ch.writeAndFlush(msg);
 		if (cf.isDone() && !cf.isSuccess()) {
 			logger.error("failed to poke!");
 			return false;

@@ -24,7 +24,16 @@ public class DeleteHandler
 
 		if(request.getBody().getPhotoPayload().hasUuid())
 		{
-			UUID uuid = UUID.fromString(request.getBody().getPhotoPayload().getUuid());
+			UUID uuid=null;
+            try
+            {
+                uuid = UUID.fromString(request.getBody().getPhotoPayload().getUuid());
+            }
+            catch(IllegalArgumentException e)
+            {
+                FailureHandler fh=new FailureHandler();
+                return fh.handleRequest(request, "Invalid Photo UUID Format");
+            }
 //			
 			
 			//deleting file

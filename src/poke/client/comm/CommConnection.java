@@ -119,12 +119,16 @@ public class CommConnection {
 		group = new NioEventLoopGroup();
 		try {
 			handler = new CommHandler();
+			
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(handler);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
 			b.option(ChannelOption.TCP_NODELAY, true);
 			b.option(ChannelOption.SO_KEEPALIVE, true);
-
+			
+			
+			boolean compressComm = false;
+			b.handler(new ClientInitializer(compressComm));
 			// Make the connection attempt.
 			channel = b.connect(host, port).syncUninterruptibly();
 
@@ -196,7 +200,7 @@ public class CommConnection {
 					if (ch.isWritable()) {
 						CommHandler handler = conn.connect().pipeline().get(CommHandler.class);
 
-						if (!handler.send(msg))
+						if (!handler.send(msg, ch))
 							conn.outbound.putFirst(msg);
 
 					} else
