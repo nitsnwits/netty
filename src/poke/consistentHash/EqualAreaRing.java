@@ -133,33 +133,6 @@ public class EqualAreaRing extends DataRing {
 		}
 	}
 	
-	/*private void addReplica(TreeMap<Long, List<DataNode>> sampleMap){
-		for(Map.Entry<Long, List<DataNode>> entry : sampleMap.entrySet()){
-			Long key = entry.getKey();
-			List<DataNode> retrievedList = entry.getValue();
-			//read number of replica nodes from properties or config file
-			int numOfReplicas = 3;
-			for(DataNode tempNode : retrievedList){
-				for(int i=0; i<nodes.size();i++){
-					int j = i;
-					DataNode orgNode = nodes.get(i);
-					if(tempNode.getId().equals(orgNode.getId())){
-						if(i==nodes.size()-1){
-							j=-1;
-						}
-						for(int k=0;k<numOfReplicas;k++){
-							j++;
-							retrievedList.add(nodes.get(j));
-							System.out.println("Node Id added to list is-->"+nodes.get(j).getId());
-						}
-					}
-				}
-				
-			}
-			
-		}
-	}*/
-	
 	public static void main(String args[]){
 		
 		EqualAreaRing eqr = new EqualAreaRing();
