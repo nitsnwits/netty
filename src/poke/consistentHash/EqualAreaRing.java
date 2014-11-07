@@ -35,8 +35,10 @@ public class EqualAreaRing extends DataRing {
 	public void createNodes(int n) {
 		this.numNodes = n;
 		long maxN = Long.MAX_VALUE;
+		//long maxN = (long) 15;
 		long range = maxN / numNodes;
 		int dataNodeId = 0;
+		//System.out.println("rannge: " + range);
 
 		for (int i = 0; i < numNodes; i++) {
 			// assume numNodes is physical nodes (we'll create data nodes based on heterogeneity)
@@ -63,7 +65,7 @@ public class EqualAreaRing extends DataRing {
 				
 				long keyRange = -1;
 				// check if this is not end of the ring
-				if (dnNum != 0) {
+				if (dataNodeId != 0) {
 					keyRange = range * (dataNodeId + 1);
 					dn.setHashLimit(keyRange);
 				} else { // circle back the ring, if it reaches 0
@@ -160,13 +162,13 @@ public class EqualAreaRing extends DataRing {
 		}
 	}
 	
-	public static void main(String args[]){
-		
-		EqualAreaRing eqr = new EqualAreaRing();
-		eqr.createNodes(5);
-		//eqr.printNodeRanges();
-		for (int i=0; i<100; i++) {
-			eqr.getPhysicalNode(UUIDGenerator.get().toString());
-		}
-	}
+//	public static void main(String args[]) {
+//		
+//		EqualAreaRing eqr = new EqualAreaRing();
+//		eqr.createNodes(5);
+//		eqr.printNodeRanges();
+//		for (int i=0; i<100; i++) {
+//			eqr.getPhysicalNode(UUIDGenerator.get().toString());
+//		}
+//	}
 }

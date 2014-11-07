@@ -58,6 +58,7 @@ public abstract class DataRing {
 
 			// sequential sucks so bubble-search
 			long kh = nodes.get(0).getHash().hash(key);
+			//System.out.println("long key: " + kh);
 			if (kh > 0l) {
 				int half = nodes.size() / 2;
 				DataNode dn = nodes.get(half);
