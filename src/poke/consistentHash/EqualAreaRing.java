@@ -53,9 +53,6 @@ public class EqualAreaRing extends DataRing {
 				DataNode dn = new DataNode();
 				dn.setId("node-" + dataNodeId);
 				
-				//let this physical node own this data node, making sure of its heterogeneity
-				pn.addOwned(dn);
-				
 				//add the mappings to a hashmap
 				nodeMap.put(dataNodeId, i);
 				
@@ -77,6 +74,9 @@ public class EqualAreaRing extends DataRing {
 				// dont know why i did this
 				keyList.add(keyRange);
 				nodes.add(dn);
+				
+				//let this physical node own this data node, making sure of its heterogeneity
+				pn.addOwned(dn);				
 				
 				// finally, the data node is added
 				dataNodeId++;				
