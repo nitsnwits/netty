@@ -1,15 +1,21 @@
 package poke.consistentHash;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import poke.hash.Ketama;
+import poke.hash.MurmurHash;
+import poke.hash.MurmurHash128;
 import poke.server.conf.HashRangeMap;
 import poke.server.conf.ServerConf;
+import poke.util.UUIDGenerator;
 
 public class EqualAreaRing extends DataRing {
 	private TreeMap<Long, List<DataNode>> rangeMap = HashRangeMap.getInstance().getRangeMap();//new TreeMap<Long, List<DataNode>>();
@@ -17,9 +23,10 @@ public class EqualAreaRing extends DataRing {
 	private ServerConf conf;
 	private ArrayList<PhysicalNode> pnodes = new ArrayList<PhysicalNode>();
 	private int numOfReplicas = 2; // for each data node, so 6 for a physical node of heterogeneity 3
+	private Map<Integer,Integer> nodeMap = new HashMap<Integer, Integer>();//hashmap of DataNode to PhysicalNode mapping 
 	
 	// crap java, somehow this is not imported :(
-	//protected static Logger logger = LoggerFactory.getLogger("Equal Area Ring");
+	// protected static Logger logger = LoggerFactory.getLogger("Equal Area Ring");
 	
 	public EqualAreaRing() {
 	}
@@ -49,8 +56,12 @@ public class EqualAreaRing extends DataRing {
 				//let this physical node own this data node, making sure of its heterogeneity
 				pn.addOwned(dn);
 				
+				//add the mappings to a hashmap
+				nodeMap.put(dataNodeId, i);
+				
 				//set ketama as hash algo for data node
 				Ketama ketama = new Ketama();
+				//MurmurHash128 murmur128 = new MurmurHash128();
 				dn.setHash(ketama);
 				
 				long keyRange = -1;
@@ -120,6 +131,15 @@ public class EqualAreaRing extends DataRing {
 		
 	}
 	
+	//get the physical node id based on the key
+	public int getPhyNode(String key){
+		int dnId  = getDataNodeId(key);
+		int pnId = nodeMap.get(dnId);
+		
+		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId);
+		return pnId;
+	}
+		
 	public void printNodeRanges() {
 		System.out.println("Hash range: 0 - " + Long.MAX_VALUE);
 		try {
@@ -129,6 +149,13 @@ public class EqualAreaRing extends DataRing {
 			for (PhysicalNode pn : pnodes) {
 				System.out.println("PNodes: " + pn.getId() + " " );
 			}
+			for (Long key : keyList){
+				System.out.println("Key Range is-->"+key);
+			}
+	
+			System.out.println("----------------------");
+			getPhyNode(UUIDGenerator.get().toString());
+
 		} catch (Exception e) {
 		}
 	}

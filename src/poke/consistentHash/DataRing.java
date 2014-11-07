@@ -50,6 +50,42 @@ public abstract class DataRing {
 			System.out.println("Error: " + key + " not accepted by ring");
 		}
 	}
+	
+	public int getDataNodeId(String key){
+		//return the Data Node Id for given key
+			if (nodes.size() == 0)
+				throw new RuntimeException("ring not initialized, no nodes found.");
+
+			// sequential sucks so bubble-search
+			long kh = nodes.get(0).getHash().hash(key);
+			if (kh > 0l) {
+				int half = nodes.size() / 2;
+				DataNode dn = nodes.get(half);
+				if (dn.getHashLimit() >= kh) {
+					for (int i = 1, I = half + 1; i < I; i++) {
+						if (nodes.get(i).addIfCoordinator(kh))
+							return i;
+					}
+				} else {
+					//System.out.println("upper half");
+					for (int i = half, I = nodes.size(); i < I; i++) {
+						if (nodes.get(i).addIfCoordinator(key))
+							return i;
+					}
+				}
+			} else {
+				for (int i = 1, I = nodes.size(); i < I; i++) {
+					if (nodes.get(i).addIfCoordinator(kh))
+						return i;
+				}
+			}
+
+			// must be the zeroth node?
+			if (!nodes.get(0).addIfCoordinator(key)) {
+				System.out.println("Error: " + key + " not accepted by ring");
+			}
+			return -2;
+	}
 
 	public void printNodeRanges(File out) {
 		System.out.println("Hash range: 0 - " + Integer.MAX_VALUE);
