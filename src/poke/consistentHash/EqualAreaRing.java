@@ -57,9 +57,9 @@ public class EqualAreaRing extends DataRing {
 				nodeMap.put(dataNodeId, i);
 				
 				//set ketama as hash algo for data node
-				Ketama ketama = new Ketama();
-				//MurmurHash128 murmur128 = new MurmurHash128();
-				dn.setHash(ketama);
+				//Ketama ketama = new Ketama();
+				MurmurHash128 murmur128 = new MurmurHash128();
+				dn.setHash(murmur128);
 				
 				long keyRange = -1;
 				// check if this is not end of the ring
@@ -164,6 +164,9 @@ public class EqualAreaRing extends DataRing {
 		
 		EqualAreaRing eqr = new EqualAreaRing();
 		eqr.createNodes(5);
-		eqr.printNodeRanges();
+		//eqr.printNodeRanges();
+		for (int i=0; i<100; i++) {
+			eqr.getPhysicalNode(UUIDGenerator.get().toString());
+		}
 	}
 }

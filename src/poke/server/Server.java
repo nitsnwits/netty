@@ -107,6 +107,7 @@ public class Server {
 			br = new BufferedInputStream(new FileInputStream(cfg));
 			br.read(raw);
 			conf = JsonUtil.decode(new String(raw), ServerConf.class);
+			//System.out.println("conf decoded: " + conf.getHeterogeneity() + " nodeName: " + conf.getNodeName());
 			if (!verifyConf(conf))
 				throw new RuntimeException("verification of configuration failed");
 			ResourceFactory.initialize(conf);

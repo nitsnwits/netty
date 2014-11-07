@@ -49,6 +49,8 @@ public class ServerConf {
 	private int port = 5570;
 	/** internal node-to-node communication (default is 5571) */
 	private int mgmtPort = 5571;
+	private int heterogeneity;
+	
 
 	private StorageConf storage;
 	private AdjacentConf adjacent;
@@ -107,6 +109,15 @@ public class ServerConf {
 	public String getNodeName() {
 		return nodeName;
 	}
+	
+	//addition for each node's heterogeneity
+	public void setHeterogeneity(int heterogeneity) {
+		this.heterogeneity = heterogeneity;
+	}
+
+	public int getHeterogeneity() {
+		return this.heterogeneity;
+	}	
 
 	public String getForwardingImplementation() {
 		return forwardingImplementation;
@@ -297,10 +308,6 @@ public class ServerConf {
 		public void setEnabled(boolean enabled) {
 			this.enabled = enabled;
 		}
-
-		public int getHeterogeneity() {
-			// TODO Auto-generated method stub
-			return 3;
-		}
+	
 	}
 }
