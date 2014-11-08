@@ -12,6 +12,7 @@ public class NodeDesc {
 	private String host;
 	private int port;
 	private int mgmtPort;
+	private int heterogeneity;
 
 	public String getHost() {
 		return host;
@@ -51,6 +52,14 @@ public class NodeDesc {
 
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
+	}
+
+	public int getHeterogeneity() {
+		return heterogeneity;
+	}
+
+	public void setHeterogeneity(int heterogeneity) {
+		this.heterogeneity = heterogeneity;
 	}
 
 }

@@ -231,7 +231,6 @@ public class ServerConf {
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static final class AdjacentConf {
 		private TreeMap<Integer, NodeDesc> adjacent;
-		private int heterogeneity;
 
 		public NodeDesc getNode(String name) {
 			return adjacent.get(name);
@@ -254,13 +253,6 @@ public class ServerConf {
 			this.adjacent = nearest;
 		}
 
-		public int getHeterogeneity() {
-			return heterogeneity;
-		}
-
-		public void setHeterogeneity(int heterogeneity) {
-			this.heterogeneity = heterogeneity;
-		}
 	}
 
 	/**
