@@ -115,7 +115,7 @@ public class ClientCommand {
 		r.setHeader(h.build());
 		Request fwdReq=r.build();
 		try {
-			System.out.println("forwarded job Request: " +fwdReq);
+			System.out.println("forwarded job Request: " +fwdReq.getHeader());
 			comm.sendMessage(fwdReq);
 			} catch (Exception e) {
 			logger.warn("Unable to deliver message, queuing");
