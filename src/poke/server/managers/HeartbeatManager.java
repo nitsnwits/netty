@@ -293,6 +293,9 @@ public class HeartbeatManager extends Thread {
 					em.startElection();
 				} else {
 					logger.info("The node which got down was not the leader, did not start election");
+					//mark the node as inactive in data ring hash map
+					logger.info("Marking the node as inactive in data ring. " + heart.getNodeId());
+					// stubbed method for updating hashmap
 				}
 			} else if (incomingHB.containsValue(heart)) {
 				logger.warn("HB incoming channel closing for node '" + heart.getNodeId() + "' at " + heart.getHost());

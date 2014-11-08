@@ -1,6 +1,8 @@
 package poke.server.conf;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import poke.consistentHash.DataNode;
@@ -15,7 +17,8 @@ import poke.consistentHash.DataNode;
 public class HashRangeMap {
 	private static HashRangeMap instance = null;
 	
-	private TreeMap<Long, List<DataNode>> rangeMap = new TreeMap<Long, List<DataNode>>();
+	//private TreeMap<Long, List<DataNode>> rangeMap = new TreeMap<Long, List<DataNode>>();
+	private Map<Integer, NodeStatus> rangeMap = new HashMap<Integer, NodeStatus>();
 	
 	public static HashRangeMap getInstance(){
 		if(instance == null){
@@ -24,12 +27,31 @@ public class HashRangeMap {
 		return instance;
 	}
 	
-	public TreeMap<Long, List<DataNode>> getRangeMap() {
+	public Map<Integer, NodeStatus> getRangeMap() {
 		return rangeMap;
 	}
 
-	public void setRangeMap(TreeMap<Long, List<DataNode>> rangeMap) {
+	public void setRangeMap(Map<Integer, NodeStatus> rangeMap) {
 		this.rangeMap = rangeMap;
+	}
+	
+	//Class for Node value and its status
+	public class NodeStatus {
+		private int physicalNodeId;
+		private int status;
+		
+		public int getNodeId() {
+			return physicalNodeId;
+		}
+		public void setNodeId(int nodeId) {
+			this.physicalNodeId = nodeId;
+		}
+		public int getStatus() {
+			return status;
+		}
+		public void setStatus(int status) {
+			this.status = status;
+		}
 	}
 
 }

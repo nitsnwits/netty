@@ -1,52 +1,52 @@
 package poke.consistentHash;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import poke.hash.Ketama;
-import poke.hash.MurmurHash;
 import poke.hash.MurmurHash128;
 import poke.server.conf.HashRangeMap;
+import poke.server.conf.HashRangeMap.NodeStatus;
 import poke.server.conf.ServerConf;
 import poke.util.UUIDGenerator;
 
 public class EqualAreaRing extends DataRing {
-	private TreeMap<Long, List<DataNode>> rangeMap = HashRangeMap.getInstance().getRangeMap();//new TreeMap<Long, List<DataNode>>();
 	private List<Long> keyList = new ArrayList<Long>();
 	private ServerConf conf;
 	private ArrayList<PhysicalNode> pnodes = new ArrayList<PhysicalNode>();
 	private int numOfReplicas = 2; // for each data node, so 6 for a physical node of heterogeneity 3
-	private Map<Integer,Integer> nodeMap = new HashMap<Integer, Integer>();//hashmap of DataNode to PhysicalNode mapping 
-	
-	// crap java, somehow this is not imported :(
-	// protected static Logger logger = LoggerFactory.getLogger("Equal Area Ring");
+	private Map<Integer, NodeStatus> nodeMap = HashRangeMap.getInstance().getRangeMap();
+	private static EqualAreaRing instance = null;
+	private int status = 1; // fall back to active for now
 	
 	public EqualAreaRing() {
+	}
+	
+	public static EqualAreaRing getInstance() {
+		if(instance == null) {
+			return new EqualAreaRing();
+		}
+		return instance;
 	}
 
 	@Override
 	public void createNodes(int n) {
-		this.numNodes = n;
+		//this.numNodes = n;
+		//this.numNodes = getNumOfDataNodes(n);
 		long maxN = Long.MAX_VALUE;
 		//long maxN = (long) 15;
-		long range = maxN / numNodes;
+		long range = maxN / getNumOfDataNodes(n);
 		int dataNodeId = 0;
 		//System.out.println("rannge: " + range);
 
-		for (int i = 0; i < numNodes; i++) {
+		for (int i = 0; i < n; i++) {
 			// assume numNodes is physical nodes (we'll create data nodes based on heterogeneity)
 			// Create physical node first, who will own this data node
 			PhysicalNode pn = new PhysicalNode();
 			pn.setId(i);
 			//Uncomment this when running a whole server, this should work then
 			//pn.setHeterogeneity(conf.getHeterogeneity());
+			//pn.setHeterogeneity(conf.getAdjacent().getAdjacentNodes().ge);
 			pn.setHeterogeneity(3); //hard code for testing
 			
 			//create data nodes equal to the physical node's heterogeneity
@@ -56,8 +56,12 @@ public class EqualAreaRing extends DataRing {
 				DataNode dn = new DataNode();
 				dn.setId("node-" + dataNodeId);
 				
-				//add the mappings to a hashmap
-				nodeMap.put(dataNodeId, i);
+				//add the mappings to a hashmap, assume all nodes are UP
+				NodeStatus nodeStatus = HashRangeMap.getInstance().new NodeStatus();
+				nodeStatus.setNodeId(i);
+				nodeStatus.setStatus(status);
+				// Now node list value will be [0, 0]
+				nodeMap.put(dataNodeId, nodeStatus);
 				
 				//set ketama as hash algo for data node
 				//Ketama ketama = new Ketama();
@@ -68,6 +72,7 @@ public class EqualAreaRing extends DataRing {
 				// check if this is not end of the ring
 				if (dataNodeId != 0) {
 					keyRange = range * (dataNodeId + 1);
+					System.out.println("keyrange: " + keyRange + " range: " + range + " dataNodeId " + dataNodeId);
 					dn.setHashLimit(keyRange);
 				} else { // circle back the ring, if it reaches 0
 					keyRange = maxN;
@@ -91,6 +96,20 @@ public class EqualAreaRing extends DataRing {
 		}
 		// Yes, replica's should be added, it's a separate method, coz DJ said it's cool
 		addReplica();
+	}
+	
+	private int getNumOfDataNodes(int numOfPhysicalNodes) {
+		int numOfDataNodes = 0;
+		for (int i = 0; i < numOfPhysicalNodes; i++) {
+			//int heterogeneity = conf.getHeterogeneity();
+			int heterogeneity = 3;
+			//conf.getAdjacent().getNode("zero").getHeterogeneity();
+			for (int dnNum = 0; dnNum < heterogeneity; dnNum++) {
+				numOfDataNodes++;
+			}
+		}
+		System.out.println("num" + numOfDataNodes);
+		return numOfDataNodes;
 	}
 	
 	private void addReplica() {
@@ -137,11 +156,23 @@ public class EqualAreaRing extends DataRing {
 	//get the physical node id based on the key
 	public int getPhysicalNode(String key){
 		int dnId  = getDataNodeId(key);
-		int pnId = nodeMap.get(dnId);
+		//int pnId = nodeMap.get(dnId);
+		NodeStatus ns = nodeMap.get(dnId);
+		int pnId = ns.getNodeId();
 		
-		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId);
+		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId + " status-->"+ ns.getStatus());
 		return pnId;
 	}
+	
+	//get the physical nodes including replicas based on the key
+	public int getPhysicalNodes(String key){
+		int dnId  = getDataNodeId(key);
+		NodeStatus ns = nodeMap.get(dnId);
+		int pnId = ns.getNodeId();
+		
+		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId + " status-->"+ ns.getStatus());
+		return pnId;
+	}	
 		
 	public void printNodeRanges() {
 		System.out.println("Hash range: 0 - " + Long.MAX_VALUE);
@@ -163,13 +194,13 @@ public class EqualAreaRing extends DataRing {
 		}
 	}
 	
-//	public static void main(String args[]) {
-//		
-//		EqualAreaRing eqr = new EqualAreaRing();
-//		eqr.createNodes(5);
-//		eqr.printNodeRanges();
-//		for (int i=0; i<100; i++) {
-//			eqr.getPhysicalNode(UUIDGenerator.get().toString());
-//		}
-//	}
+	public static void main(String args[]) {
+		
+		EqualAreaRing eqr = new EqualAreaRing();
+		eqr.createNodes(5);
+		eqr.printNodeRanges();
+		for (int i=0; i<100; i++) {
+			eqr.getPhysicalNode(UUIDGenerator.get().toString());
+		}
+	}
 }
