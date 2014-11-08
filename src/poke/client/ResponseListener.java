@@ -13,25 +13,38 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package poke.client.comm;
+package poke.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import poke.client.comm.CommListener;
+import poke.client.util.ClientUtil;
+import eye.Comm.Header;
 import eye.Comm.Request;
 
-public interface CommListener {
-	/**
-	 * identifies the listener - if it needs to be removed or tracked
-	 * 
-	 * @return
-	 */
-	String getListenerID();
+/**
+ * example listener that an application would use to receive events.
+ * 
+ * @author gash
+ * 
+ */
+public class ResponseListener implements CommListener {
+	protected static Logger logger = LoggerFactory.getLogger("connect");
 
-	/**
-	 * receives the message event from the client's channel
-	 * 
-	 * @param msg
-	 *            Both requests and responses are held in the same message
-	 *            structure
-	 * @return 
-	 */
-	eye.Comm.Request onMessage(eye.Comm.Request msg);
+	private String id;
+
+	public ResponseListener(String id) {
+		this.id = id;
+	}
+
+	@Override
+	public String getListenerID() {
+		return id;
+	}
+
+	@Override
+	public eye.Comm.Request onMessage(eye.Comm.Request msg) {
+		return msg;
+	}
 }

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import poke.client.comm.CommListener;
 import poke.client.util.ClientUtil;
 import eye.Comm.Header;
+import eye.Comm.Request;
 
 /**
  * example listener that an application would use to receive events.
@@ -43,7 +44,7 @@ public class ClientPrintListener implements CommListener {
 	}
 
 	@Override
-	public void onMessage(eye.Comm.Request msg) {
+	public eye.Comm.Request onMessage(eye.Comm.Request msg) {
 		if (logger.isDebugEnabled())
 			ClientUtil.printHeader(msg.getHeader());
 
@@ -58,5 +59,6 @@ public class ClientPrintListener implements CommListener {
 		} else {
 			// unexpected reply - how do you handle this?
 		}
+		return null;
 	}
 }

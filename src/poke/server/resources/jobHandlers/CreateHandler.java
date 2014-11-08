@@ -24,10 +24,10 @@ public class CreateHandler
 	public Request handleRequest(Request request) 
 	{
 
-		if(request.getBody().getPhotoPayload().hasData() && request.getBody().getPhotoPayload().hasName())
+		if(request.getBody().getPhotoPayload().hasData() && request.getBody().getPhotoPayload().hasName() && request.getBody().getPhotoPayload().hasUuid())
 		{
 			ByteString bs=request.getBody().getPhotoPayload().getData();
-			UUID photoId=UUIDGenerator.get();
+			UUID photoId=UUID.fromString(request.getBody().getPhotoPayload().getUuid());
 			Operations mongoOps= new Operations();
 			Date lastModified=  new Date();
 			

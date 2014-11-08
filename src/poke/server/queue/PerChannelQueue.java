@@ -26,6 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import poke.client.ClientCommand;
+import poke.client.ClientPrintListener;
+import poke.client.ResponseListener;
+import poke.client.comm.CommHandler;
 import poke.server.conf.NodeDesc;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceFactory;
@@ -35,6 +38,7 @@ import com.google.protobuf.GeneratedMessage;
 
 import eye.Comm.PokeStatus;
 import eye.Comm.Request;
+import eye.Comm.PhotoHeader.RequestType;
 
 import com.google.protobuf.UninitializedMessageException;
 
@@ -100,7 +104,6 @@ public class PerChannelQueue implements ChannelQueue {
 	@Override
 	public void shutdown(boolean hard) {
 		logger.info("server is shutting down");
-
 		channel = null;
 
 		if (hard) {
@@ -263,9 +266,12 @@ public class PerChannelQueue implements ChannelQueue {
 					// process request and enqueue response
 					if (msg instanceof Request) {
 						Request req = ((Request) msg);
-
+						if(req.getHeader().getPhotoHeader().getRequestType()==RequestType.write)
+						{ //generate and append uuid to the request
+							req=ResourceUtil.modifyToIncludeUUID(req);
+						}
 						// do we need to route the request?
-						boolean needToRoute= ResourceFactory.getInstance().needToRoute(req.getHeader());
+						boolean needToRoute= ResourceFactory.getInstance().needToRoute(req.getHeader(), req.getBody().getPhotoPayload().getUuid());
 						Request reply = null;
 						if(!needToRoute)
 						{
@@ -282,10 +288,21 @@ public class PerChannelQueue implements ChannelQueue {
 						}
 						else
 						{
-							NodeDesc destinationNode = ResourceFactory.getInstance().getDeterminedNode(req.getHeader());
+							NodeDesc destinationNode = ResourceFactory.getInstance().getDeterminedNode(req.getHeader(), req.getBody().getPhotoPayload().getUuid());
 							ClientCommand destHop=new ClientCommand(destinationNode.getHost(), destinationNode.getPort());
 							//destHop.poke("from Server 0", 0);
+							ResponseListener rl=new ResponseListener("response");
 							destHop.forwardJob(req,destinationNode.getNodeId());
+							destHop.addListener(rl);
+							while(true)
+							{
+								if(CommHandler.getResponse()!=null)
+								{
+									reply=CommHandler.getResponse();
+									break;
+								}
+							}
+							//reply = destHop.addListener()
 							
 						}
 

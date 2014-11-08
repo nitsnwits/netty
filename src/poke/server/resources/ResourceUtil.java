@@ -19,12 +19,14 @@ import java.util.Date;
 import java.util.List;
 
 import poke.server.conf.ServerConf;
+import poke.util.UUIDGenerator;
 import eye.Comm.Header;
 import eye.Comm.Header.Routing;
 import eye.Comm.Payload;
 import eye.Comm.PhotoHeader;
 import eye.Comm.PhotoHeader.RequestType;
 import eye.Comm.PhotoHeader.ResponseFlag;
+import eye.Comm.PhotoPayload;
 import eye.Comm.PokeStatus;
 import eye.Comm.Request;
 import eye.Comm.RoutingPath;
@@ -118,5 +120,24 @@ public class ResourceUtil {
 		bldr.setTime(System.currentTimeMillis());
 
 		return bldr.build();
+	}
+
+	public static Request modifyToIncludeUUID(Request req) {
+		Request.Builder r= Request.newBuilder();
+		r.setHeader(req.getHeader());
+		PhotoPayload.Builder ppb= PhotoPayload.newBuilder();
+        ppb.setUuid(UUIDGenerator.get().toString());
+        //ppb.setData(null);
+        ppb.setName(req.getBody().getPhotoPayload().getName());
+        ppb.setData(req.getBody().getPhotoPayload().getData());
+        
+        
+        //Setting Payload
+        Payload.Builder pb=Payload.newBuilder();
+        pb.setPhotoPayload(ppb.build());
+        r.setBody(pb.build());
+        
+        Request reply = r.build();
+		return reply;
 	}
 }

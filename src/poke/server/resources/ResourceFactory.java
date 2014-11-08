@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import poke.client.ClientCommand;
+import poke.consistentHash.EqualAreaRing;
 import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
 import poke.server.conf.ServerConf.ResourceConf;
@@ -102,39 +103,34 @@ public class ResourceFactory {
 	public static void setCfg(ServerConf cfg) {
 		ResourceFactory.cfg = cfg;
 	}
-
-	public boolean needToRoute(Header header) {
+	
+	public int getDestNodeId(Header header, String uuid )
+	{
 		int determinedNode=-1;
 		int destHop=-1;
 		if (!header.hasToNode()) {
 			// Determine node with hashing
 			// Uncomment next line to enable pinging to determined node.
-			determinedNode =1;
+			determinedNode=EqualAreaRing.getInstance().getPhysicalNode(uuid);
 		}					
 		if (header.hasToNode())
 			destHop=header.getToNode();
 		else
 			destHop=determinedNode;
+		return destHop;
+	}
+
+	public boolean needToRoute(Header header, String uuid) {
+		int destHop= getDestNodeId(header, uuid);
 		if (cfg.getNodeId() != destHop)
 			return true;
 		else
 			return false;
 	}
 
-	public NodeDesc getDeterminedNode(Header header) 
+	public NodeDesc getDeterminedNode(Header header, String uuid) 
 	{
-		int determinedNode=-1;
-		int destHop=-1;
-		if (!header.hasToNode()) 
-		{
-			// Determine node with hashing
-			// Uncomment next line to enable pinging to determined node.
-			determinedNode =1;
-		}					
-		if (header.hasToNode())
-			destHop=header.getToNode();
-		else
-			destHop=determinedNode;
+		int destHop=getDestNodeId(header, uuid);
 		
 		for (NodeDesc nn : cfg.getAdjacent().getAdjacentNodes().values()) 
 		{

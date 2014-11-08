@@ -26,13 +26,15 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import com.google.protobuf.GeneratedMessage;
+
+import eye.Comm.Request;
 
 public class CommHandler extends SimpleChannelInboundHandler<eye.Comm.Request> {
 	protected static Logger logger = LoggerFactory.getLogger("connect");
-	protected ConcurrentMap<String, CommListener> listeners = new ConcurrentHashMap<String, CommListener>();
+	protected static ConcurrentMap<String, CommListener> listeners = new ConcurrentHashMap<String, CommListener>();
 	private volatile Channel channel;
+	protected static Request response;
 
 	public CommHandler() {
 	}
@@ -91,7 +93,15 @@ public class CommHandler extends SimpleChannelInboundHandler<eye.Comm.Request> {
 
 			// TODO this may need to be delegated to a thread pool to allow
 			// async processing of replies
-			cl.onMessage(msg);
+			response = cl.onMessage(msg);
 		}
+	}
+
+	public static Request getResponse() {
+		return response;
+	}
+
+	public static void setResponse(Request response) {
+		CommHandler.response = response;
 	}
 }
