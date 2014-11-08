@@ -19,12 +19,13 @@ public class EqualAreaRing extends DataRing {
 	private static EqualAreaRing instance = null;
 	private int status = 1; // fall back to active for now
 	
-	public EqualAreaRing() {
+	public EqualAreaRing(int n) {
+		createNodes(n);
 	}
 	
 	public static EqualAreaRing getInstance() {
 		if(instance == null) {
-			return new EqualAreaRing();
+			return new EqualAreaRing(5);
 		}
 		return instance;
 	}
@@ -194,13 +195,13 @@ public class EqualAreaRing extends DataRing {
 		}
 	}
 	
-	public static void main(String args[]) {
-		
-		EqualAreaRing eqr = new EqualAreaRing();
-		eqr.createNodes(5);
-		eqr.printNodeRanges();
-		for (int i=0; i<100; i++) {
-			eqr.getPhysicalNode(UUIDGenerator.get().toString());
-		}
-	}
+//	public static void main(String args[]) {
+//		
+//		EqualAreaRing eqr = new EqualAreaRing();
+//		eqr.createNodes(5);
+//		eqr.printNodeRanges();
+//		for (int i=0; i<100; i++) {
+//			eqr.getPhysicalNode(UUIDGenerator.get().toString());
+//		}
+//	}
 }
