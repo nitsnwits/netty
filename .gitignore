@@ -3,7 +3,6 @@
 .settings
 build_pb.sh
 python/*.sh
-*.sh
 classes/
 python/comm_pb2.*
 generated/
