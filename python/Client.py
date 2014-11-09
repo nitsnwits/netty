@@ -105,7 +105,7 @@ class Client():
 			if (response.header.photoHeader.responseFlag == 0):
 				path = raw_input("\n\tEnter Path to store image: ")
 				if (os.path.exists(path) == True and path[-1] == '/'):
-					path = os.path.abspath(path)
+					#path = os.path.abspath(path)
 					name = path + str(response.body.photoPayload.name)
 					data = str(response.body.photoPayload.data)
 					fo = open(name, "wb")
@@ -119,7 +119,7 @@ class Client():
 				else:
 					print "\n\tUser Error: Invalid path entered."
 			else:
-				print "\t Response Code \t->\t" + "Unable to fulfill read request."
+				print "\t Response Code \t->\t" + "Unable to fulfill read request: " + response.body.photoPayload.data
 		else:
 			print "\n\t***** No response received from server *****\n"
 
@@ -132,7 +132,7 @@ class Client():
 				print "\t Response Code \t->\t" + "Success"
 				print "\t Photo UUID \t->\t" + str(response.body.photoPayload.uuid)	
 			else:
-				print "\t Response Code \t->\t" + "Unable to fulfill create request."
+				print "\t Response Code \t->\t" + "Unable to fulfill create request: " + response.body.photoPayload.data
 		else:
 			print "\n\t***** No response received from server *****\n"
 
@@ -144,7 +144,7 @@ class Client():
 				print "\t Originator \t->\t" + str(response.header.originator)
 				print "\t Response Code \t->\t" + "Success"
 			else:
-				print "\t Response Code \t->\t" + "Unable to fulfill delete request."
+				print "\t Response Code \t->\t" + "Unable to fulfill delete request: " + response.body.photoPayload.data
 		else:
 			print "\n\t***** No response received from server *****\n"			
 					  
