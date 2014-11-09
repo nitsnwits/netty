@@ -30,6 +30,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.server.conf.HashRangeMap;
 import eye.Comm.Management;
 import eye.Comm.MgmtHeader;
 import eye.Comm.Network;
@@ -220,6 +221,10 @@ public class HeartMonitor {
 
 			ch.writeAndFlush(m.build());
 			rtn = true;
+			
+			//upon successful connection to client, update status to active
+			HashRangeMap.getInstance().setNodeActive(toNodeId);
+			
 		} catch (Exception e) {
 			// logger.error("could not send connect to node", e);
 		}

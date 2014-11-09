@@ -34,15 +34,16 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.consistentHash.EqualAreaRing;
 import poke.server.conf.JsonUtil;
 import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
 import poke.server.management.ManagementInitializer;
 import poke.server.management.ManagementQueue;
 import poke.server.managers.ElectionManager;
-import poke.server.managers.HeartbeatPusher;
 import poke.server.managers.HeartbeatData;
 import poke.server.managers.HeartbeatManager;
+import poke.server.managers.HeartbeatPusher;
 import poke.server.managers.JobManager;
 import poke.server.managers.NetworkManager;
 import poke.server.resources.ResourceFactory;
@@ -274,6 +275,8 @@ public class Server {
 		// create manager for leader election. The number of votes (default 1)
 		// is used to break ties where there are an even number of nodes.
 		electionMgr = ElectionManager.initManager(conf);
+		
+		EqualAreaRing.initializeConf(conf);
 
 		// create manager for accepting jobs
 		jobMgr = JobManager.initManager(conf);

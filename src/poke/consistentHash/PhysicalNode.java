@@ -64,4 +64,15 @@ public class PhysicalNode {
 		this.heterogeneity = heterogeneity;
 	}
 
+	public boolean isDataNodePresent(int dataNodeId){
+		boolean flag = false;
+		for(DataNode dn : replica){
+			if(dn.getId().equals("node-"+dataNodeId)){
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}	
+
 }

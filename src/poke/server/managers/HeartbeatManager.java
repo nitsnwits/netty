@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import poke.consistentHash.EqualAreaRing;
 import poke.server.conf.HashRangeMap;
 import poke.server.conf.ServerConf;
 import poke.server.conf.ServerConf.AdjacentConf;

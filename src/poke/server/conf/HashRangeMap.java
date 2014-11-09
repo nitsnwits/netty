@@ -17,8 +17,10 @@ import poke.consistentHash.DataNode;
 public class HashRangeMap {
 	private static HashRangeMap instance = null;
 	private int inactiveStatus = 0;
+	private int activeStatus = 1;
 	
 	//private TreeMap<Long, List<DataNode>> rangeMap = new TreeMap<Long, List<DataNode>>();
+	// Key is DataNodeId: NodeStatus has PhysicalNodeId and its Status
 	private Map<Integer, NodeStatus> rangeMap = new HashMap<Integer, NodeStatus>();
 	
 	public static HashRangeMap getInstance(){
@@ -63,6 +65,27 @@ public class HashRangeMap {
 				entry.getValue().setStatus(inactiveStatus);
 			}
 		}
+	}
+	
+	// update hash map with active node status
+	public void setNodeActive(int physicalNodeId) {
+		// find instances of physical node everywhere in the hash and set active status to 1
+		for (Map.Entry<Integer, NodeStatus> entry : rangeMap.entrySet()) {
+			if (entry.getValue().getNodeId() == physicalNodeId) {
+				entry.getValue().setStatus(activeStatus);
+			}
+		}
+	}
+	
+	public boolean isActivePhysicalNode(int physicalNodeId) {
+		boolean rtn = false;
+		// find instance of physical node and return the status if active
+		for (Map.Entry<Integer, NodeStatus> entry : rangeMap.entrySet()) {
+			if (entry.getValue().getNodeId() == physicalNodeId && entry.getValue().getStatus() == activeStatus) {
+				rtn = true;
+			}
+		}
+		return rtn;
 	}
 
 }

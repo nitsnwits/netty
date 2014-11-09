@@ -12,10 +12,10 @@ import poke.util.UUIDGenerator;
 
 public class EqualAreaRing extends DataRing {
 	private List<Long> keyList = new ArrayList<Long>();
-	private ServerConf conf;
+	private static ServerConf conf;
 	private ArrayList<PhysicalNode> pnodes = new ArrayList<PhysicalNode>();
 	private int numOfReplicas = 2; // for each data node, so 6 for a physical node of heterogeneity 3
-	private Map<Integer, NodeStatus> nodeMap = HashRangeMap.getInstance().getRangeMap();
+	private Map<Integer, NodeStatus> rangeMap = HashRangeMap.getInstance().getRangeMap();
 	private static EqualAreaRing instance = null;
 	private int status = 1; // fall back to active for now
 	
@@ -25,14 +25,18 @@ public class EqualAreaRing extends DataRing {
 	
 	public static EqualAreaRing getInstance() {
 		if(instance == null) {
-			return new EqualAreaRing(2);
+			instance = new EqualAreaRing(conf.getAdjacent().getAdjacentNodes().size() + 1);
 		}
 		return instance;
+	}
+	
+	public static void initializeConf(ServerConf conf) {
+		EqualAreaRing.conf = conf;
 	}
 
 	@Override
 	public void createNodes(int n) {
-		//this.numNodes = n;
+		this.numNodes = n;
 		//this.numNodes = getNumOfDataNodes(n);
 		long maxN = Long.MAX_VALUE;
 		//long maxN = (long) 15;
@@ -46,14 +50,14 @@ public class EqualAreaRing extends DataRing {
 			PhysicalNode pn = new PhysicalNode();
 			pn.setId(i);
 			//Uncomment this when running a whole server, this should work then
-//			if (i == conf.getNodeId()) {
-//				// if current running node is this node
-//				pn.setHeterogeneity(conf.getHeterogeneity());
-//			} else {
-//				pn.setHeterogeneity(conf.getAdjacent().getAdjacentNodes().get(i).getHeterogeneity());
-//			}
+			if (i == conf.getNodeId()) {
+				// if current running node is this node
+				pn.setHeterogeneity(conf.getHeterogeneity());
+			} else {
+				pn.setHeterogeneity(conf.getAdjacent().getAdjacentNodes().get(i).getHeterogeneity());
+			}
 			
-			pn.setHeterogeneity(3); //hard code for testing
+			//pn.setHeterogeneity(3); //hard code for testing
 			
 			//create data nodes equal to the physical node's heterogeneity
 			for (int dnNum = 0; dnNum < pn.getHeterogeneity(); dnNum++) {
@@ -67,7 +71,7 @@ public class EqualAreaRing extends DataRing {
 				nodeStatus.setNodeId(i);
 				nodeStatus.setStatus(status);
 				// Now node list value will be [0, 0]
-				nodeMap.put(dataNodeId, nodeStatus);
+				rangeMap.put(dataNodeId, nodeStatus);
 				
 				//set ketama as hash algo for data node
 				//Ketama ketama = new Ketama();
@@ -106,10 +110,14 @@ public class EqualAreaRing extends DataRing {
 	
 	private int getNumOfDataNodes(int numOfPhysicalNodes) {
 		int numOfDataNodes = 0;
+		int heterogeneity = 0;
 		for (int i = 0; i < numOfPhysicalNodes; i++) {
-			//int heterogeneity = conf.getHeterogeneity();
-			int heterogeneity = 3;
-			//conf.getAdjacent().getNode("zero").getHeterogeneity();
+			if (i == conf.getNodeId()) {
+				// if current running node is this node
+				heterogeneity = conf.getHeterogeneity();
+			} else {
+				heterogeneity = conf.getAdjacent().getAdjacentNodes().get(i).getHeterogeneity();
+			}
 			for (int dnNum = 0; dnNum < heterogeneity; dnNum++) {
 				numOfDataNodes++;
 			}
@@ -139,23 +147,21 @@ public class EqualAreaRing extends DataRing {
 					pnNext = 0;
 				}
 				
+				// add replicas to the node
+				pNode.addReplica(pnodes.get(pnNext).getOwns().get(pnNextOwnIndex));
+				pnNextOwnIndex++;
+				
 				// checks if the loop iteration has reached the data node size of next physical node
 				// if reached, then moves to next physical node
 				if(pnNextOwnIndex > pnodes.get(pnNext).getOwns().size() - 1) {
 					pnNext++;
-				}
-				
-				// add replicas to the node
-				pNode.addReplica(pnodes.get(pnNext).getOwns().get(pnNextOwnIndex));
-				if (pnNextOwnIndex == pnodes.get(pnNext).getOwns().size() - 1) {
 					pnNextOwnIndex = 0;
-				} else {
-					pnNextOwnIndex++;
-				}
+				}				
 				
 			}
 			
 		}
+		printNodeRanges();
 		
 	}
 	
@@ -163,7 +169,7 @@ public class EqualAreaRing extends DataRing {
 	public int getPhysicalNode(String key){
 		int dnId  = getDataNodeId(key);
 		//int pnId = nodeMap.get(dnId);
-		NodeStatus ns = nodeMap.get(dnId);
+		NodeStatus ns = rangeMap.get(dnId);
 		int pnId = ns.getNodeId();
 		
 		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId + " status-->"+ ns.getStatus());
@@ -171,14 +177,28 @@ public class EqualAreaRing extends DataRing {
 	}
 	
 	//get the physical nodes including replicas based on the key
-	public int getPhysicalNodes(String key){
-		int dnId  = getDataNodeId(key);
-		NodeStatus ns = nodeMap.get(dnId);
-		int pnId = ns.getNodeId();
-		
-		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId + " status-->"+ ns.getStatus());
-		return pnId;
-	}	
+		public List<Integer> getPhysicalNodes(String key){
+			System.out.println("----------- getPhysicalNodes --------------");
+			int dnId  = getDataNodeId(key);
+			NodeStatus ns = rangeMap.get(dnId);
+			int pnId = ns.getNodeId();
+			
+			List<Integer> phyNodeList = new ArrayList<Integer>();
+			
+			if(HashRangeMap.getInstance().isActivePhysicalNode(pnId))
+				phyNodeList.add(pnId);
+			
+			//get the replicas for this datanode
+			for(PhysicalNode phyNode : pnodes){
+				if(phyNode.isDataNodePresent(dnId) && 
+						HashRangeMap.getInstance().isActivePhysicalNode(phyNode.getId())){
+					phyNodeList.add(phyNode.getId());
+				}
+			}
+			
+			//System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId + " status-->"+ ns.getStatus());
+			return phyNodeList;
+		}	
 		
 	public void printNodeRanges() {
 		System.out.println("Hash range: 0 - " + Long.MAX_VALUE);
@@ -200,13 +220,13 @@ public class EqualAreaRing extends DataRing {
 		}
 	}
 	
-//	public static void main(String args[]) {
-//		
-//		EqualAreaRing eqr = new EqualAreaRing();
-//		eqr.createNodes(5);
-//		eqr.printNodeRanges();
-//		for (int i=0; i<100; i++) {
-//			eqr.getPhysicalNode(UUIDGenerator.get().toString());
-//		}
-//	}
+	public static void main(String args[]) {
+		
+		EqualAreaRing eqr = EqualAreaRing.getInstance();
+		//eqr.createNodes(5);
+		//eqr.printNodeRanges();
+		for (int i=0; i<100; i++) {
+			eqr.getPhysicalNode(UUIDGenerator.get().toString());
+		}
+	}
 }
