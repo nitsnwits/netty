@@ -25,7 +25,7 @@ public class EqualAreaRing extends DataRing {
 	
 	public static EqualAreaRing getInstance() {
 		if(instance == null) {
-			return new EqualAreaRing(5);
+			return new EqualAreaRing(2);
 		}
 		return instance;
 	}
