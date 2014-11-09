@@ -26,10 +26,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.consistentHash.EqualAreaRing;
+import poke.server.conf.HashRangeMap;
 import poke.server.conf.ServerConf;
 import poke.server.conf.ServerConf.AdjacentConf;
 import poke.server.management.ManagementQueue;
-import poke.server.management.ManagementQueue.ManagementQueueEntry;
 import poke.server.managers.HeartbeatData.BeatStatus;
 
 import com.google.protobuf.GeneratedMessage;
@@ -293,10 +294,13 @@ public class HeartbeatManager extends Thread {
 					em.startElection();
 				} else {
 					logger.info("The node which got down was not the leader, did not start election");
-					//mark the node as inactive in data ring hash map
-					logger.info("Marking the node as inactive in data ring. " + heart.getNodeId());
-					// stubbed method for updating hashmap
 				}
+				
+				//mark the node as inactive in data ring hash map
+				logger.info("Marking the node as inactive in data ring. nodeId: " + heart.getNodeId());
+				// stubbed method for updating hashmap
+				HashRangeMap.getInstance().setNodeInactive(heart.getNodeId());
+				
 			} else if (incomingHB.containsValue(heart)) {
 				logger.warn("HB incoming channel closing for node '" + heart.getNodeId() + "' at " + heart.getHost());
 				incomingHB.remove(future.channel());
