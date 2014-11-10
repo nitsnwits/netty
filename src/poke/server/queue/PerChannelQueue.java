@@ -20,6 +20,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
 import java.lang.Thread.State;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.slf4j.Logger;
@@ -305,8 +306,17 @@ public class PerChannelQueue implements ChannelQueue {
 							//reply = destHop.addListener()
 							
 						}
-
+						System.out.println("");
 						sq.enqueueResponse(reply, null);
+						if(req.getHeader().getPhotoHeader().getRequestType()==RequestType.write || req.getHeader().getPhotoHeader().getRequestType()==RequestType.delete)
+						{
+							List<NodeDesc> replicas= ResourceFactory.getInstance().getReplicationNodes(req.getHeader(), req.getBody().getPhotoPayload().getUuid());
+							for(NodeDesc replica : replicas)
+							{
+								ClientCommand replicaHop=new ClientCommand(replica.getHost(), replica.getPort());
+								replicaHop.forwardJob(req,replica.getNodeId());
+							}
+						}
 					}
 
 				} catch (InterruptedException ie) {

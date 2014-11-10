@@ -21,8 +21,11 @@ public class HashRangeMap {
 	
 	//private TreeMap<Long, List<DataNode>> rangeMap = new TreeMap<Long, List<DataNode>>();
 	// Key is DataNodeId: NodeStatus has PhysicalNodeId and its Status
-	private Map<Integer, NodeStatus> rangeMap = new HashMap<Integer, NodeStatus>();
-	
+	private Map<Integer, NodeStatus> rangeMap;
+	private HashRangeMap()
+	{
+		rangeMap= new HashMap<Integer, NodeStatus>();
+	}
 	public static HashRangeMap getInstance(){
 		if(instance == null){
 			instance = new HashRangeMap();

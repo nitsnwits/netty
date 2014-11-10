@@ -15,23 +15,23 @@ public class EqualAreaRing extends DataRing {
 	private static ServerConf conf;
 	private ArrayList<PhysicalNode> pnodes = new ArrayList<PhysicalNode>();
 	private int numOfReplicas = 2; // for each data node, so 6 for a physical node of heterogeneity 3
-	private Map<Integer, NodeStatus> rangeMap = HashRangeMap.getInstance().getRangeMap();
+	//private static Map<Integer, NodeStatus> rangeMap = HashRangeMap.getInstance().getRangeMap();
 	private static EqualAreaRing instance = null;
-	private int status = 1; // fall back to active for now
+	private int status = 0; // fall back to active for now
 	
-	public EqualAreaRing(int n) {
-		createNodes(n);
+	private EqualAreaRing() {
 	}
 	
 	public static EqualAreaRing getInstance() {
 		if(instance == null) {
-			instance = new EqualAreaRing(conf.getAdjacent().getAdjacentNodes().size() + 1);
+			instance = new EqualAreaRing();
 		}
 		return instance;
 	}
 	
-	public static void initializeConf(ServerConf conf) {
-		EqualAreaRing.conf = conf;
+	public void initializeConf(ServerConf conf) {
+		EqualAreaRing.getInstance().conf = conf;
+		createNodes(conf.getAdjacent().getAdjacentNodes().size() + 1);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class EqualAreaRing extends DataRing {
 				nodeStatus.setNodeId(i);
 				nodeStatus.setStatus(status);
 				// Now node list value will be [0, 0]
-				rangeMap.put(dataNodeId, nodeStatus);
+				HashRangeMap.getInstance().getRangeMap().put(dataNodeId, nodeStatus);
 				
 				//set ketama as hash algo for data node
 				//Ketama ketama = new Ketama();
@@ -169,7 +169,7 @@ public class EqualAreaRing extends DataRing {
 	public int getPhysicalNode(String key){
 		int dnId  = getDataNodeId(key);
 		//int pnId = nodeMap.get(dnId);
-		NodeStatus ns = rangeMap.get(dnId);
+		NodeStatus ns = HashRangeMap.getInstance().getRangeMap().get(dnId);
 		int pnId = ns.getNodeId();
 		
 		System.out.println("Key is--->>"+key + "  dnID-->" + dnId+ " pnId-->"+ pnId + " status-->"+ ns.getStatus());
@@ -180,7 +180,7 @@ public class EqualAreaRing extends DataRing {
 		public List<Integer> getPhysicalNodes(String key){
 			System.out.println("----------- getPhysicalNodes --------------");
 			int dnId  = getDataNodeId(key);
-			NodeStatus ns = rangeMap.get(dnId);
+			NodeStatus ns = HashRangeMap.getInstance().getRangeMap().get(dnId);
 			int pnId = ns.getNodeId();
 			
 			List<Integer> phyNodeList = new ArrayList<Integer>();

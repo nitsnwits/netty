@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import poke.consistentHash.EqualAreaRing;
+import poke.server.conf.HashRangeMap;
 import poke.server.conf.JsonUtil;
 import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
@@ -276,7 +277,7 @@ public class Server {
 		// is used to break ties where there are an even number of nodes.
 		electionMgr = ElectionManager.initManager(conf);
 		
-		EqualAreaRing.initializeConf(conf);
+		EqualAreaRing.getInstance().initializeConf(conf);
 
 		// create manager for accepting jobs
 		jobMgr = JobManager.initManager(conf);
@@ -321,6 +322,9 @@ public class Server {
 
 		StartCommunication comm = new StartCommunication(conf);
 		logger.info("Server " + conf.getNodeId() + " ready");
+		
+		logger.info("Making this server active by default: " + conf.getNodeId());
+		HashRangeMap.getInstance().setNodeActive(conf.getNodeId());
 
 		Thread cthread = new Thread(comm);
 		cthread.start();

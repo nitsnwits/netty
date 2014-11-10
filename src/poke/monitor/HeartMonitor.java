@@ -30,6 +30,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.consistentHash.EqualAreaRing;
 import poke.server.conf.HashRangeMap;
 import eye.Comm.Management;
 import eye.Comm.MgmtHeader;
@@ -223,8 +224,9 @@ public class HeartMonitor {
 			rtn = true;
 			
 			//upon successful connection to client, update status to active
+			EqualAreaRing.getInstance();
 			HashRangeMap.getInstance().setNodeActive(toNodeId);
-			
+			logger.info("Adding Node to active hashmap: " + toNodeId);
 		} catch (Exception e) {
 			// logger.error("could not send connect to node", e);
 		}

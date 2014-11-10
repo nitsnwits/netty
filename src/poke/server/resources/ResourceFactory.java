@@ -16,6 +16,8 @@
 package poke.server.resources;
 
 import java.beans.Beans;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -111,21 +113,14 @@ public class ResourceFactory {
 		if (!header.hasToNode()) {
 			// Determine node with hashing
 			// Uncomment next line to enable pinging to determined node.
-			determinedNode=EqualAreaRing.getInstance().getPhysicalNode(uuid);
+			determinedNode= EqualAreaRing.getInstance().getPhysicalNodes(uuid).get(0);
 		}					
-		if (header.hasToNode())
-			destHop=header.getToNode();
-		else
-			destHop=determinedNode;
-		return destHop;
+		return (header.hasToNode())?header.getToNode():determinedNode;
 	}
 
 	public boolean needToRoute(Header header, String uuid) {
 		int destHop= getDestNodeId(header, uuid);
-		if (cfg.getNodeId() != destHop)
-			return true;
-		else
-			return false;
+		return (cfg.getNodeId() != destHop)?true:false;
 	}
 
 	public NodeDesc getDeterminedNode(Header header, String uuid) 
@@ -141,5 +136,22 @@ public class ResourceFactory {
 		}
 		return null;
 	}
+	public List getReplicationNodes(Header header, String uuid )
+	{
+		List nodes= EqualAreaRing.getInstance().getPhysicalNodes(uuid);
+		nodes.remove(0);
+		List<NodeDesc> replicas=new ArrayList<NodeDesc>();
+		for(int i=0; i<nodes.size();i++)
+		{
+			for (NodeDesc nn : cfg.getAdjacent().getAdjacentNodes().values()) 
+			{
+				if(nn.getNodeId()==(Integer)nodes.get(i))
+				{
+					replicas.add(nn);
+				}
+			}
+		}
+		return replicas;
+	}					
 
 }
