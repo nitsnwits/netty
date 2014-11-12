@@ -10,8 +10,6 @@ import poke.consistentHash.DataNode;
 /**
  * This class will hold the key range and list of 
  * corresponding nodes for that key range.
- * 
- * @author dhananjay
  *
  */
 public class HashRangeMap {
