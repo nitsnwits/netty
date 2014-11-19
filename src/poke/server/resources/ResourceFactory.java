@@ -113,7 +113,8 @@ public class ResourceFactory {
 		if (!header.hasToNode()) {
 			// Determine node with hashing
 			// Uncomment next line to enable pinging to determined node.
-			determinedNode= EqualAreaRing.getInstance().getPhysicalNodes(uuid).get(0);
+			//determinedNode= EqualAreaRing.getInstance().getPhysicalNodes(uuid).get(0);
+			determinedNode= EqualAreaRing.getInstance().getPhysicalNode(uuid);
 		}					
 		return (header.hasToNode())?header.getToNode():determinedNode;
 	}

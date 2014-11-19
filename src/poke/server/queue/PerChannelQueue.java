@@ -31,6 +31,7 @@ import poke.client.ClientPrintListener;
 import poke.client.ResponseListener;
 import poke.client.comm.CommHandler;
 import poke.server.conf.NodeDesc;
+import poke.server.managers.ClientCommandManager;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceFactory;
 import poke.server.resources.ResourceUtil;
@@ -81,12 +82,13 @@ public class PerChannelQueue implements ChannelQueue {
 	protected void init() {
 		inbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 		outbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
-
+		for(int i=0;i<10;i++)
+		{
 		iworker = new InboundWorker(tgroup, 1, this);
 		iworker.start();
-
 		oworker = new OutboundWorker(tgroup, 1, this);
 		oworker.start();
+		}
 
 		// let the handler manage the queue's shutdown
 		// register listener to receive closing of channel
@@ -290,8 +292,14 @@ public class PerChannelQueue implements ChannelQueue {
 						else
 						{
 							NodeDesc destinationNode = ResourceFactory.getInstance().getDeterminedNode(req.getHeader(), req.getBody().getPhotoPayload().getUuid());
-							ClientCommand destHop=new ClientCommand(destinationNode.getHost(), destinationNode.getPort());
-							//destHop.poke("from Server 0", 0);
+							ClientCommand destHop=null;
+							if(ClientCommandManager.hasConnection(destinationNode.getNodeId()))
+								destHop=ClientCommandManager.getConnection(destinationNode.getNodeId());
+							else
+							{
+								destHop=new ClientCommand(destinationNode.getHost(), destinationNode.getPort());
+								ClientCommandManager.addConnection(destinationNode.getNodeId(), destHop);
+							}
 							ResponseListener rl=new ResponseListener("response");
 							destHop.forwardJob(req,destinationNode.getNodeId());
 							destHop.addListener(rl);
@@ -303,20 +311,22 @@ public class PerChannelQueue implements ChannelQueue {
 									break;
 								}
 							}
-							//reply = destHop.addListener()
 							
 						}
 						System.out.println("");
 						sq.enqueueResponse(reply, null);
-						if(req.getHeader().getPhotoHeader().getRequestType()==RequestType.write || req.getHeader().getPhotoHeader().getRequestType()==RequestType.delete)
-						{
-							List<NodeDesc> replicas= ResourceFactory.getInstance().getReplicationNodes(req.getHeader(), req.getBody().getPhotoPayload().getUuid());
-							for(NodeDesc replica : replicas)
-							{
-								ClientCommand replicaHop=new ClientCommand(replica.getHost(), replica.getPort());
-								replicaHop.forwardJob(req,replica.getNodeId());
-							}
-						}
+						
+						
+						//replication Logic
+//						if(req.getHeader().getPhotoHeader().getRequestType()==RequestType.write || req.getHeader().getPhotoHeader().getRequestType()==RequestType.delete)
+//						{
+//							List<NodeDesc> replicas= ResourceFactory.getInstance().getReplicationNodes(req.getHeader(), req.getBody().getPhotoPayload().getUuid());
+//							for(NodeDesc replica : replicas)
+//							{
+//								ClientCommand replicaHop=new ClientCommand(replica.getHost(), replica.getPort());
+//								replicaHop.forwardJob(req,replica.getNodeId());
+//							}
+//						}
 					}
 
 				} catch (InterruptedException ie) {
